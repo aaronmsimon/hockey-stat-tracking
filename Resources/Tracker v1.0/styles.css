@@ -1,0 +1,187 @@
+body {
+
+    font-family: Arial, sans-serif;
+
+    margin: 20px;
+
+}
+
+ 
+
+#app {
+
+    max-width: 800px;
+
+    margin: 0 auto;
+
+}
+
+ 
+
+form {
+
+    margin-bottom: 20px;
+
+}
+
+ 
+
+label {
+
+    display: block;
+
+    margin-bottom: 5px;
+
+}
+
+ 
+
+input {
+
+    width: 100%;
+
+    padding: 8px;
+
+    margin-bottom: 10px;
+
+}
+
+ 
+
+button {
+
+    padding: 10px 20px;
+
+    background-color: #007BFF;
+
+    color: white;
+
+    border: none;
+
+    cursor: pointer;
+
+    margin-right: 10px;
+
+}
+
+ 
+
+button:hover {
+
+    background-color: #0056b3;
+
+}
+
+ 
+
+#dataList {
+
+    margin-top: 20px;
+
+}
+
+ 
+
+#dataTable {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+                font-size: 12px; /* added */
+
+}
+
+ 
+
+#dataTable th, #dataTable td {
+
+    padding: 10px;
+
+    border: 1px solid #ddd;
+
+    text-align: left;
+
+}
+
+ 
+
+#dataTable th {
+
+    background-color: #f8f9fa;
+
+}
+
+ 
+
+#dataTable tr:nth-child(even) {
+
+    /*background-color: #f1f1f1;*/
+
+}
+
+ 
+
+#dataTable tr:hover {
+
+    background-color: #ddd;
+
+}
+
+ 
+
+#dataTable td {
+
+                padding: 5px 10px; /* added */
+
+}
+
+ 
+
+#dataTable button {
+
+    background-color: transparent;
+
+                color: black; /* added */
+
+    border: none;
+
+    cursor: pointer;
+
+    margin-right: 10px;
+
+}
+
+ 
+
+#dataTable button i {
+
+    font-size: 16px;
+
+}
+
+ 
+
+#editIndicator {
+
+    color: #007BFF;
+
+    margin-top: 10px;
+
+}
+
+ 
+
+.editButton, .deleteButton {
+
+                padding: 1px 5px; /* added */
+
+}
+
+ 
+
+.hidden {
+
+                display: none; /* added */
+
+}
