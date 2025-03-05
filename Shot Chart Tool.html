@@ -1,0 +1,290 @@
+<html>
+	<head>
+	  <meta charset="UTF-8">
+	  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	  <title>Hockey Shot Tracker</title>
+	  <style>
+		body {
+		  font-family: Arial, sans-serif;
+		  text-align: center;
+		  margin: 0;
+		  padding: 0;
+		}
+
+		#rink-container {
+		  position: relative;
+		  width: 1240px;
+		  height: 527px;
+		  margin: 20px auto;
+		  background: url('path/to/blank_rink.svg') no-repeat center;
+		  background-size: cover;
+		  border: 2px solid #ccc;
+		  border-radius: 8px;
+		}
+
+		.shot {
+		  position: absolute;
+		  width: 16px;
+		  height: 16px;
+		  border-radius: 50%;
+		  display: flex;
+		  align-items: center;
+		  justify-content: center;
+		  font-size: 10px;
+		  color: #fff;
+		  font-weight: bold;
+		  cursor: pointer;
+		}
+
+		.missed {
+		  background-color: red;
+		}
+
+		.made {
+		  background-color: green;
+		}
+
+		.team-settings {
+		  margin: 10px 0;
+		}
+
+		#exportData {
+		  margin-top: 10px;
+		  padding: 10px 15px;
+		  background-color: #007bff;
+		  color: #fff;
+		  border: none;
+		  border-radius: 5px;
+		  cursor: pointer;
+		}
+
+		#exportData:hover {
+		  background-color: #0056b3;
+		}
+	  </style>
+	</head>
+	<body>
+	  <h1>Hockey Shot Tracker</h1>
+
+	  <div class="team-settings">
+		<label>Team 1 Name: <input type="text" id="team1-name" placeholder="Team 1" /></label>
+		<label>Color: <input type="color" id="team1-color" value="#ff0000" /></label>
+		<input type="radio" id="team1-selected" name="team-shot-entry" value="team1" checked="checked">
+	  </div>
+
+	  <div class="team-settings">
+		<label>Team 2 Name: <input type="text" id="team2-name" placeholder="Team 2" /></label>
+		<label>Color: <input type="color" id="team2-color" value="#0000ff" /></label>
+		<input type="radio" id="team2-selected" name="team-shot-entry" value="team2">
+	  </div>
+	  
+	  <label>Period
+		  <input type="radio" id="period-1" name="period" value="1st" checked="checked">
+		  <label for="period-1">1st</label>
+		  <input type="radio" id="period-2" name="period" value="2nd">
+		  <label for="period-2">2nd</label>
+		  <input type="radio" id="period-3" name="period" value="3rd">
+		  <label for="period-3">3rd</label>
+		  <input type="radio" id="period-ot" name="period" value="Overtime">
+		  <label for="period-ot">OT</label>
+		  <input type="text" id="time-elapsed" placeholder="Time" size="5" style="margin-left: 10px;" />
+	  </label><br><br>
+	  
+		<label for="jerseyNumber">Jersey Number:</label>
+		<input type="text" id="jerseyNumber" size="5"><br><br>
+
+		<input type="radio" id="shot-missed" name="shot-type" value="missed" checked="checked">
+		<label for="shot-missed">Missed</label>
+		<input type="radio" id="shot-made" name="shot-type" value="made">
+		<label for="shot-made">Made</label><br>
+
+	<div id="rink-container">
+		<svg id="rink" class="shotchart-svg Ov(v) W(100%) Bdrs(8px) Va(m)" viewBox="0 0 620 263.5">
+			<defs>
+				<filter id="drop-shadow" x="-100%" y="-100%" width="300%" height="300%">
+					<feGaussianBlur in="SourceAlpha" stdDeviation="2"></feGaussianBlur>
+					<feOffset dy="2" result="offsetblur"></feOffset>
+					<feFlood style="flood-color: rgb(0, 0, 0); flood-opacity: 0.2;"></feFlood>
+					<feComposite in2="offsetblur" operator="in"></feComposite>
+					<feMerge>
+						<feMergeNode></feMergeNode>
+						<feMergeNode in="SourceGraphic"></feMergeNode>
+					</feMerge>
+				</filter>
+				<g id="made"><circle r="8" style="filter: url(&quot;#drop-shadow&quot;);"></circle><rect width="24" height="24" x="-12" y="-12" opacity="0"></rect></g>
+				<g id="missed"><path transform="scale(1.25)" d="m -4.425644,-6.7126989 c -0.7623521,0.7623517 -1.5247037,1.5247034 -2.2870554,2.2870551 1.4752116,1.4752144 2.9504324,2.9504327 4.4256444,4.4256443 -1.475212,1.475212 -2.9504328,2.950433 -4.4256444,4.425644 0.7623517,0.762352 1.5247033,1.524704 2.2870554,2.287055 C -2.950433,5.2374885 -1.475212,3.7622675 0,2.2870555 1.475212,3.7622675 2.950433,5.2374885 4.425644,6.7126995 5.187996,5.9503485 5.950348,5.1879965 6.712699,4.4256445 5.237488,2.9504335 3.762267,1.4752125 2.287055,5e-7 3.762267,-1.4752111 5.237488,-2.9504294 6.712699,-4.4256438 5.950348,-5.1879955 5.187996,-5.9503472 4.425644,-6.7126989 2.950433,-5.2374844 1.475212,-3.762269 0,-2.2870545 -1.475212,-3.762269 -2.950433,-5.2374844 -4.425644,-6.7126989 Z" style="filter: url(&quot;#drop-shadow&quot;);"></path><rect width="24" height="24" x="-12" y="-12" opacity="0"></rect></g>
+				<linearGradient id="baseGradient"><stop offset="0.6" stop-color="#fff" stop-opacity="1"></stop><stop offset="1" stop-color="#eceff3" stop-opacity="1"></stop></linearGradient>
+				<radialGradient gradientUnits="userSpaceOnUse" gradientTransform="matrix(1,0,0,0.425,0,75.75625)" r="310" fy="131.75" fx="310" cy="131.75" cx="310" id="radialGradient" href="#baseGradient"></radialGradient>
+				<clipPath id="shotChartClip"><rect height="263.5" width="620"></rect></clipPath>
+				<g id="shotchartBackground" clip-path=""><rect ry="70.842003" rx="86.071999" height="263.5" width="620" style="fill: url(&quot;#radialGradient&quot;); stroke: rgb(185, 189, 197); stroke-width: 2;"></rect><circle cx="310" cy="131.75" r="46.5" style="opacity: 0.64; stroke: rgb(204, 51, 51); stroke-width: 2; stroke-opacity: 1; fill: none;"></circle><path d="m 309.89289,0 0.21421,263.49931" style="fill: none; stroke: rgb(204, 51, 51); stroke-width: 3; stroke-opacity: 1; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; stroke-dasharray: 6, 6; stroke-dashoffset: 3.2;"></path><circle r="6.2323289" cy="131.75" cx="310" style="opacity: 0.64; stroke: none; fill: rgb(204, 51, 51);"></circle></g>
+				<g id="shotchartLines" clip-path="url(#shotChartClip)"><path d="m 198.2929,0 0.21421,263.49931" style="opacity: 0.64; stroke: rgb(68, 102, 187); stroke-width: 3; stroke-opacity: 1; fill: none;"></path><path d="M 35.102489,139.79334 24.38582,139.5806 v -16.6638 l 10.541793,-0.0709" style="opacity: 0.64; stroke: rgb(204, 51, 51); stroke-width: 2; stroke-opacity: 1; fill: none;"></path><path d="M 34.11879,15.367341 34.08121,247.27176" style="opacity: 0.64; stroke: rgb(204, 51, 51); stroke-width: 2; stroke-opacity: 1; fill: none;"></path><path d="m 34.240618,119.47097 c 14.639706,-0.039 15.125557,23.7977 -0.145268,23.69692" style="opacity: 0.64; stroke: rgb(204, 51, 51); stroke-width: 2; stroke-opacity: 1; fill: none;"></path><circle r="46.5" cy="62" cx="96.1" style="opacity: 0.64; stroke: rgb(204, 51, 51); stroke-width: 2; stroke-opacity: 1; fill: none;"></circle><circle cx="96.1" cy="62" r="6.2323289" style="opacity: 0.64; stroke: none; fill: rgb(204, 51, 51);"></circle><path d="M 100.75,107.50001 V 117.5" style="opacity: 0.64; stroke: rgb(204, 51, 51); stroke-width: 2; stroke-opacity: 1; fill: none;"></path><path d="m 91.449999,107.50001 0,10" style="opacity: 0.64; stroke: rgb(204, 51, 51); stroke-width: 2; stroke-opacity: 1; fill: none;"></path><path d="M 100.75,6.5202958 V 16.520291" style="opacity: 0.64; stroke: rgb(204, 51, 51); stroke-width: 2; stroke-opacity: 1; fill: none;"></path><path d="m 91.449999,6.5202958 0,10" style="opacity: 0.64; stroke: rgb(204, 51, 51); stroke-width: 2; stroke-opacity: 1; fill: none;"></path><circle cx="96.1" cy="201.5" r="46.5" style="opacity: 0.64; stroke: rgb(204, 51, 51); stroke-width: 2; stroke-opacity: 1; fill: none;"></circle><circle r="6.2323289" cy="201.5" cx="96.1" style="opacity: 0.64; stroke: none; fill: rgb(204, 51, 51);"></circle><path d="m 100.75,247 v 10" style="opacity: 0.64; stroke: rgb(204, 51, 51); stroke-width: 2; stroke-opacity: 1; fill: none;"></path><path d="m 91.45,247 0,10" style="opacity: 0.64; stroke: rgb(204, 51, 51); stroke-width: 2; stroke-opacity: 1; fill: none;"></path><path d="m 100.75,146.0203 v 10" style="opacity: 0.64; stroke: rgb(204, 51, 51); stroke-width: 2; stroke-opacity: 1; fill: none;"></path><path d="m 91.45,146.0203 0,10" style="opacity: 0.64; stroke: rgb(204, 51, 51); stroke-width: 2; stroke-opacity: 1; fill: none;"></path></g>
+			</defs>
+			<use id="shotchartBackgroundUse" href="#shotchartBackground"></use>
+			<use href="#shotchartLines" fill="#000" transform="scale(-1, 1) translate(-620)"></use>
+			<use href="#shotchartLines" fill="#000"></use>
+			<!--svg id="logo" width="118" height="17" x="41%" y="93%" viewBox="0 0 541 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<g transform=""><path d="M82.9294 19.4733V23.5877C80.5617 20.5177 76.1863 18.447 71.1446 18.447C59.1437 18.447 50.2128 29.0435 50.2128 41.4855C50.2128 54.2787 59.0627 64.524 71.1446 64.524C76.2313 64.524 80.6067 62.5073 82.9745 59.2663V63.3806H97.9553V19.5003L82.9294 19.4733ZM103.078 0.0269802V63.3536H118.581V39.946C118.581 35.3905 120.769 32.6716 124.28 32.6716C127.791 32.6716 129.619 35.0394 129.619 39.4148V63.3266H145.122V35.7326C145.122 25.0461 139.342 18.393 130.06 18.393C127.848 18.3122 125.648 18.7534 123.638 19.6809C121.628 20.6084 119.865 21.9961 118.491 23.7317V0L103.078 0.0269802ZM244.901 41.4404C244.901 54.5757 234.827 64.479 221.421 64.479C208.016 64.479 197.951 54.5757 197.951 41.4404C197.951 28.3052 207.989 18.447 221.421 18.447C234.854 18.447 244.901 28.3502 244.901 41.4585V41.4404ZM195.322 41.4404C195.322 54.5757 185.248 64.479 171.842 64.479C158.437 64.479 148.363 54.5757 148.363 41.4404C148.363 28.3052 158.473 18.447 171.842 18.447C185.212 18.447 195.322 28.3502 195.322 41.4855V41.4404ZM0.0214844 19.4733L18.7746 63.7047L12.0584 79.6669H28.5338L53.4989 19.4913H37.1136L26.9492 45.2397L16.875 19.4913L0.0214844 19.4733ZM74.2236 50.4794C73.0293 50.5048 71.8421 50.29 70.7323 49.8479C69.6226 49.4058 68.6129 48.7454 67.7632 47.9057C66.9134 47.0661 66.241 46.0644 65.7857 44.96C65.3304 43.8556 65.1015 42.671 65.1126 41.4765C65.1015 40.282 65.3304 39.0974 65.7857 37.993C66.241 36.8886 66.9134 35.8868 67.7632 35.0472C68.6129 34.2075 69.6226 33.5471 70.7323 33.105C71.8421 32.6629 73.0293 32.4482 74.2236 32.4736C75.4096 32.4603 76.5862 32.6841 77.6845 33.1319C78.7828 33.5796 79.7805 34.2422 80.6192 35.0809C81.4579 35.9195 82.1205 36.9173 82.5683 38.0156C83.016 39.1138 83.2398 40.2905 83.2266 41.4765C83.2398 42.6625 83.016 43.8391 82.5683 44.9374C82.1205 46.0357 81.4579 47.0334 80.6192 47.8721C79.7805 48.7107 78.7828 49.3734 77.6845 49.8211C76.5862 50.2689 75.4096 50.4927 74.2236 50.4794V50.4794ZM180.566 41.4765C180.594 40.3143 180.387 39.1583 179.958 38.0779C179.529 36.9975 178.886 36.0147 178.068 35.1885C177.251 34.3623 176.274 33.7095 175.199 33.2693C174.123 32.8291 172.969 32.6105 171.806 32.6266C170.644 32.6105 169.49 32.8291 168.414 33.2693C167.338 33.7095 166.362 34.3623 165.544 35.1885C164.726 36.0147 164.084 36.9975 163.655 38.0779C163.225 39.1583 163.019 40.3143 163.046 41.4765C163.019 42.6387 163.225 43.7946 163.655 44.875C164.084 45.9554 164.726 46.9382 165.544 47.7644C166.362 48.5907 167.338 49.2434 168.414 49.6836C169.49 50.1238 170.644 50.3424 171.806 50.3263C172.969 50.3424 174.123 50.1238 175.199 49.6836C176.274 49.2434 177.251 48.5907 178.068 47.7644C178.886 46.9382 179.529 45.9554 179.958 44.875C180.387 43.7946 180.594 42.6387 180.566 41.4765V41.4765ZM230.145 41.4765C230.173 40.3143 229.966 39.1583 229.537 38.0779C229.108 36.9975 228.465 36.0147 227.648 35.1885C226.83 34.3623 225.854 33.7095 224.778 33.2693C223.702 32.8291 222.548 32.6105 221.385 32.6266C220.223 32.6105 219.069 32.8291 217.993 33.2693C216.917 33.7095 215.941 34.3623 215.123 35.1885C214.306 36.0147 213.663 36.9975 213.234 38.0779C212.804 39.1583 212.598 40.3143 212.626 41.4765C212.598 42.6387 212.804 43.7946 213.234 44.875C213.663 45.9554 214.306 46.9382 215.123 47.7644C215.941 48.5907 216.917 49.2434 217.993 49.6836C219.069 50.1238 220.223 50.3424 221.385 50.3263C222.548 50.3424 223.702 50.1238 224.778 49.6836C225.854 49.2434 226.83 48.5907 227.648 47.7644C228.465 46.9382 229.108 45.9554 229.537 44.875C229.966 43.7946 230.173 42.6387 230.145 41.4765V41.4765ZM246.792 54.0806C246.777 55.4076 247.028 56.7241 247.529 57.9529C248.03 59.1817 248.772 60.298 249.71 61.2364C250.649 62.1748 251.765 62.9163 252.994 63.4174C254.222 63.9186 255.539 64.1693 256.866 64.1549C258.238 64.1669 259.599 63.9054 260.87 63.3857C262.14 62.8661 263.294 62.0986 264.265 61.1281C265.235 60.1576 266.003 59.0035 266.522 57.7332C267.042 56.463 267.303 55.1019 267.291 53.7295C267.314 52.4032 267.071 51.0858 266.575 49.8555C266.079 48.6252 265.341 47.507 264.405 46.5674C263.469 45.6278 262.353 44.8858 261.125 44.3855C259.896 43.8853 258.579 43.6369 257.253 43.6552C255.883 43.6504 254.525 43.9169 253.258 44.4391C251.991 44.9613 250.84 45.7291 249.871 46.6981C248.902 47.6672 248.134 48.8183 247.612 50.0853C247.089 51.3523 246.823 52.7102 246.828 54.0806H246.792ZM268.867 0.0630271L252.401 39.8289H270.83L287.296 0.0630271H268.867Z" fill="#6001D2"></path><path d="M461.142 18.933C460.377 18.687 459.578 18.5684 458.774 18.5819C453.148 18.5819 449.105 21.3909 446.728 26.4055V19.6353H430.91V63.5786H446.819V47.5803C446.819 39.4057 450.6 34.8412 457.28 34.8412C458.593 34.8151 459.901 35.0224 461.142 35.4534V18.933ZM540.161 49.543C540.161 42.4217 535.326 38.5594 525.567 35.8315L523.019 35.1293C519.418 34.166 518.014 33.8149 518.014 32.7616C518.014 31.5282 518.977 30.961 521.354 30.961C525.855 30.961 530.141 32.4464 534.624 34.6521L539.54 23.1374C533.921 20.2066 527.691 18.6398 521.354 18.5639C510.01 18.5639 502.277 24.2808 502.277 33.5088C502.277 41.3233 507.291 45.1046 517.221 47.3913L519.508 47.9225C522.848 48.7147 524.343 49.1468 524.343 50.3802C524.343 51.8747 522.848 52.3159 520.561 52.3159C515.394 52.1384 510.35 50.6881 505.878 48.0935L500.26 59.5182C505.527 62.9483 512.909 64.92 520.381 64.92C531.986 64.92 540.188 59.3832 540.188 49.615L540.161 49.543ZM341.196 79.9549V58.96C343.897 62.7323 348.669 64.8479 353.935 64.8479C365.891 64.8479 374.597 54.5666 374.597 41.6474C374.597 28.7282 365.963 18.4469 353.917 18.4469C351.464 18.3717 349.029 18.8831 346.813 19.9385C344.597 20.9939 342.666 22.5628 341.178 24.5148V19.6803H325.18V79.9999L341.196 79.9549ZM340.755 41.6384C340.743 40.4482 340.969 39.2676 341.421 38.1662C341.872 37.0649 342.54 36.0652 343.384 35.226C344.228 34.3869 345.232 33.7253 346.336 33.2804C347.44 32.8355 348.622 32.6162 349.812 32.6355C350.998 32.6222 352.175 32.8461 353.273 33.2938C354.371 33.7415 355.369 34.4041 356.208 35.2428C357.046 36.0815 357.709 37.0792 358.157 38.1775C358.604 39.2758 358.828 40.4525 358.815 41.6384C358.822 42.8206 358.594 43.9924 358.143 45.0855C357.693 46.1785 357.029 47.1709 356.191 48.0048C355.353 48.8386 354.358 49.4972 353.262 49.9422C352.167 50.3871 350.994 50.6095 349.812 50.5963C348.625 50.6168 347.447 50.3998 346.345 49.9581C345.243 49.5164 344.241 48.8589 343.397 48.0243C342.554 47.1897 341.885 46.1948 341.431 45.0982C340.978 44.0015 340.748 42.8252 340.755 41.6384V41.6384ZM402.524 18.4469C388.723 18.4469 378.441 28.4672 378.441 41.6564C378.441 54.8457 388.723 64.857 402.524 64.857C416.326 64.857 426.517 54.8367 426.517 41.6564C426.517 28.4762 416.236 18.4469 402.524 18.4469ZM411.221 41.6564C411.226 42.7999 411.004 43.9329 410.569 44.9902C410.133 46.0475 409.493 47.0081 408.684 47.8166C407.876 48.6251 406.915 49.2656 405.858 49.7009C404.801 50.1363 403.668 50.358 402.524 50.3533C401.38 50.358 400.247 50.1364 399.189 49.7011C398.131 49.2659 397.17 48.6256 396.361 47.8172C395.551 47.0088 394.91 46.0482 394.474 44.9908C394.037 43.9335 393.815 42.8003 393.818 41.6564C393.813 40.5118 394.035 39.3776 394.471 38.3192C394.907 37.2608 395.548 36.2992 396.358 35.4898C397.167 34.6805 398.128 34.0394 399.187 33.6036C400.245 33.1678 401.38 32.9458 402.524 32.9506C403.668 32.9458 404.802 33.1678 405.86 33.6038C406.918 34.0397 407.879 34.6809 408.688 35.4904C409.496 36.2999 410.136 37.2616 410.571 38.3199C411.006 39.3783 411.227 40.5123 411.221 41.6564V41.6564ZM470.991 6.05884V19.6803H465.103V32.5995H470.991V48.2465C470.991 58.6989 477.14 64.7669 487.251 64.7669C490.657 64.8156 494.046 64.2796 497.271 63.1824V49.678C495.764 50.1699 494.192 50.4369 492.607 50.4703C488.916 50.4703 486.99 48.7957 486.99 44.4923V32.6265H497.271V19.7073H486.99V6.08587L470.991 6.05884ZM320.877 49.516C320.877 42.3947 316.042 38.5324 306.283 35.8045L303.735 35.1023C300.134 34.139 298.729 33.7879 298.729 32.7345C298.729 31.5011 299.693 30.9339 302.069 30.9339C306.571 30.9339 310.856 32.4194 315.34 34.6251L320.255 23.1104C314.636 20.1796 308.406 18.6128 302.069 18.5369C290.726 18.5369 282.992 24.2538 282.992 33.4818C282.992 41.2963 288.007 45.0775 297.937 47.3643L300.224 47.8955C303.564 48.6877 305.058 49.1199 305.058 50.3533C305.058 51.8477 303.564 52.2889 301.277 52.2889C296.11 52.1114 291.066 50.6611 286.593 48.0665L280.976 59.4912C286.242 62.9214 293.58 64.893 301.097 64.893C312.702 64.893 320.904 59.3562 320.904 49.588L320.877 49.516Z" fill="#232A31"></path></g>
+			</svg-->
+			<g id="team1" transform="scale(-1, 1) translate(-620)">
+<!--
+				45163030<g><use fill="#041e42" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team1" data-period="1st" data-clock="4:21" data-player-id="nhl.p.6494" data-player-image="https://s.yimg.com/iu/api/res/1.2/7x.x8u6gYHXhZWf9rnGKfQ--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10142024/6494.png" data-shot-text="Gustav Forsling shot on goal" aria-label="Gustav Forsling shot on goal 4:21" x="511.5" y="196.85000000000002" href="#missed"></use></g>
+				92393730<g><use fill="#041e42" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team1" data-period="2nd" data-clock="14:54" data-player-id="nhl.p.6370" data-player-image="https://s.yimg.com/iu/api/res/1.2/ILG_BmE.z7pKwSng0RNmpQ--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10142024/6370.png" data-shot-text="Sam Bennett shot on goal" aria-label="Sam Bennett shot on goal 14:54" x="496" y="203.05" href="#missed"></use></g>
+				78481690<g><use fill="#041e42" stroke="#fff" stroke-opacity="1" stroke-width="3" tabindex="0" class="made" data-team="team1" data-period="2nd" data-clock="3:01" data-player-id="nhl.p.6781" data-player-image="https://s.yimg.com/iu/api/res/1.2/QhfDM5ZrWMg1E5Q9FyHJmg--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10142024/6781.png" data-shot-text="A.J. Greer 6 (Assists: Tomas Nosek 8)" aria-label="A.J. Greer 6 (Assists: Tomas Nosek 8) 3:01" x="539.4" y="125.55" href="#made"></use></g>
+				57456700<g><use fill="#041e42" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team1" data-period="1st" data-clock="14:23" data-player-id="nhl.p.6370" data-player-image="https://s.yimg.com/iu/api/res/1.2/ILG_BmE.z7pKwSng0RNmpQ--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10142024/6370.png" data-shot-text="Sam Bennett shot on goal" aria-label="Sam Bennett shot on goal 14:23" x="542.5" y="128.65" href="#missed"></use></g>
+				110648780<g><use fill="#041e42" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team1" data-period="3rd" data-clock="1:19" data-player-id="nhl.p.5932" data-player-image="https://s.yimg.com/iu/api/res/1.2/3gMwUv4wq9mJKWEi58SDww--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10022024/5932.png" data-shot-text="Nate Schmidt shot on goal" aria-label="Nate Schmidt shot on goal 1:19" x="393.7" y="122.45" href="#missed"></use></g>
+				56496700<g><use fill="#041e42" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team1" data-period="1st" data-clock="12:47" data-player-id="nhl.p.6368" data-player-image="https://s.yimg.com/iu/api/res/1.2/KyDX_JMEONADakyv.c5vpQ--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10022024/6368.png" data-shot-text="Sam Reinhart shot on goal" aria-label="Sam Reinhart shot on goal 12:47" x="446.4" y="175.15" href="#missed"></use></g>
+				120139450<g><use fill="#041e42" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team1" data-period="3rd" data-clock="11:17" data-player-id="nhl.p.30522" data-player-image="https://s.yimg.com/iu/api/res/1.2/7vWRGgoAAWbZ.4w7yLTbpA--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10142024/30522.png" data-shot-text="Mackie Samoskevich shot on goal" aria-label="Mackie Samoskevich shot on goal 11:17" x="548.7" y="97.65" href="#missed"></use></g>
+				114615340<g><use fill="#041e42" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team1" data-period="3rd" data-clock="6:06" data-player-id="nhl.p.5932" data-player-image="https://s.yimg.com/iu/api/res/1.2/3gMwUv4wq9mJKWEi58SDww--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10022024/5932.png" data-shot-text="Nate Schmidt shot on goal" aria-label="Nate Schmidt shot on goal 6:06" x="353.4" y="7.75" href="#missed"></use></g>
+				128555030<g><use fill="#041e42" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team1" data-period="3rd" data-clock="17:23" data-player-id="nhl.p.30327" data-player-image="https://s.yimg.com/iu/api/res/1.2/oE6wIY3NBiE5bh6uhKsOBw--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10142024/30327.png" data-shot-text="Uvis Balinskis shot on goal" aria-label="Uvis Balinskis shot on goal 17:23" x="415.4" y="29.450000000000003" href="#missed"></use></g>
+				128775030<g><use fill="#041e42" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team1" data-period="3rd" data-clock="17:45" data-player-id="nhl.p.6869" data-player-image="https://s.yimg.com/iu/api/res/1.2/gE.m6cn1TN8knjj5P0HIfg--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10142024/6869.png" data-shot-text="Niko Mikkola shot on goal" aria-label="Niko Mikkola shot on goal 17:45" x="539.4" y="215.45" href="#missed"></use></g>
+				113320570<g><use fill="#041e42" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team1" data-period="3rd" data-clock="4:40" data-player-id="nhl.p.5981" data-player-image="https://s.yimg.com/iu/api/res/1.2/Z1gq_ttRmA6kF5IUMLUXeg--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10142024/5981.png" data-shot-text="Aleksander Barkov shot on goal" aria-label="Aleksander Barkov shot on goal 4:40" x="527" y="240.25" href="#missed"></use></g>
+				60873380<g><use fill="#041e42" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team1" data-period="1st" data-clock="16:29" data-player-id="nhl.p.8652" data-player-image="https://s.yimg.com/iu/api/res/1.2/K6qse2FYYENT11MFlT.jyA--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10142024/8652.png" data-shot-text="Anton Lundell shot on goal" aria-label="Anton Lundell shot on goal 16:29" x="582.8" y="122.45" href="#missed"></use></g>
+				62717970<g><use fill="#041e42" stroke="#fff" stroke-opacity="1" stroke-width="3" tabindex="0" class="made" data-team="team1" data-period="1st" data-clock="17:08" data-player-id="nhl.p.6367" data-player-image="https://s.yimg.com/iu/api/res/1.2/qdBG6Br6.jfgzlpEYVqhcA--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10142024/6367.png" data-shot-text="Aaron Ekblad 3 (Assists: Matthew Tkachuk 28)" aria-label="Aaron Ekblad 3 (Assists: Matthew Tkachuk 28) 17:08" x="434" y="60.45" href="#made"></use></g>
+				95967340<g><use fill="#041e42" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team1" data-period="2nd" data-clock="17:41" data-player-id="nhl.p.6370" data-player-image="https://s.yimg.com/iu/api/res/1.2/ILG_BmE.z7pKwSng0RNmpQ--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10142024/6370.png" data-shot-text="Sam Bennett shot on goal" aria-label="Sam Bennett shot on goal 17:41" x="468.1" y="227.85000000000002" href="#missed"></use></g>
+				128785130<g><use fill="#041e42" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team1" data-period="3rd" data-clock="17:47" data-player-id="nhl.p.7551" data-player-image="https://s.yimg.com/iu/api/res/1.2/B3QP_jx2oObNO2RKxfOq9Q--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10142024/7551.png" data-shot-text="Jesper Boqvist shot on goal" aria-label="Jesper Boqvist shot on goal 17:47" x="561.1" y="144.15" href="#missed"></use></g>
+				112670570<g><use fill="#041e42" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team1" data-period="3rd" data-clock="3:35" data-player-id="nhl.p.30522" data-player-image="https://s.yimg.com/iu/api/res/1.2/7vWRGgoAAWbZ.4w7yLTbpA--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10142024/30522.png" data-shot-text="Mackie Samoskevich shot on goal" aria-label="Mackie Samoskevich shot on goal 3:35" x="545.6" y="48.05" href="#missed"></use></g>
+				90874320<g><use fill="#041e42" stroke="#fff" stroke-opacity="1" stroke-width="3" tabindex="0" class="made" data-team="team1" data-period="2nd" data-clock="13:07" data-player-id="nhl.p.7551" data-player-image="https://s.yimg.com/iu/api/res/1.2/B3QP_jx2oObNO2RKxfOq9Q--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10142024/7551.png" data-shot-text="Jesper Boqvist 12 (Assists: Anton Lundell 21, Carter Verhaeghe 24)" aria-label="Jesper Boqvist 12 (Assists: Anton Lundell 21, Carter Verhaeghe 24) 13:07" x="554.9" y="134.85" href="#made"></use></g>
+				94616710<g><use fill="#041e42" stroke="#fff" stroke-opacity="1" stroke-width="3" tabindex="0" class="made" data-team="team1" data-period="2nd" data-clock="16:25" data-player-id="nhl.p.6368" data-player-image="https://s.yimg.com/iu/api/res/1.2/KyDX_JMEONADakyv.c5vpQ--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10022024/6368.png" data-shot-text="Sam Reinhart 29 (Assists: Matthew Tkachuk 29, Aleksander Barkov 30)" aria-label="Sam Reinhart 29 (Assists: Matthew Tkachuk 29, Aleksander Barkov 30) 16:25" x="548.7" y="131.75" href="#made"></use></g>
+				92623730<g><use fill="#041e42" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team1" data-period="2nd" data-clock="15:17" data-player-id="nhl.p.8652" data-player-image="https://s.yimg.com/iu/api/res/1.2/K6qse2FYYENT11MFlT.jyA--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10142024/8652.png" data-shot-text="Anton Lundell shot on goal" aria-label="Anton Lundell shot on goal 15:17" x="539.4" y="125.55" href="#missed"></use></g>
+				81955710<g><use fill="#041e42" stroke="#fff" stroke-opacity="1" stroke-width="3" tabindex="0" class="made" data-team="team1" data-period="2nd" data-clock="5:35" data-player-id="nhl.p.7114" data-player-image="https://s.yimg.com/iu/api/res/1.2/BZbADP5lBat3VlYfl7_rEA--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10142024/7114.png" data-shot-text="Matthew Tkachuk 15 (power-play) (Assists: Aleksander Barkov 29, Aaron Ekblad 19)" aria-label="Matthew Tkachuk 15 (power-play) (Assists: Aleksander Barkov 29, Aaron Ekblad 19) 5:35" x="579.7" y="141.05" href="#made"></use></g>
+				77412040<g><use fill="#041e42" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team1" data-period="2nd" data-clock="1:14" data-player-id="nhl.p.30522" data-player-image="https://s.yimg.com/iu/api/res/1.2/7vWRGgoAAWbZ.4w7yLTbpA--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10142024/30522.png" data-shot-text="Mackie Samoskevich shot on goal" aria-label="Mackie Samoskevich shot on goal 1:14" x="480.5" y="44.95" href="#missed"></use></g>
+				46724570<g><use fill="#041e42" stroke="#fff" stroke-opacity="1" stroke-width="3" tabindex="0" class="made" data-team="team1" data-period="1st" data-clock="5:47" data-player-id="nhl.p.5932" data-player-image="https://s.yimg.com/iu/api/res/1.2/3gMwUv4wq9mJKWEi58SDww--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10022024/5932.png" data-shot-text="Nate Schmidt 5 (Unassisted)" aria-label="Nate Schmidt 5 (Unassisted) 5:47" x="458.8" y="110.05" href="#made"></use></g>
+				80591140<g><use fill="#041e42" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team1" data-period="2nd" data-clock="5:03" data-player-id="nhl.p.30522" data-player-image="https://s.yimg.com/iu/api/res/1.2/7vWRGgoAAWbZ.4w7yLTbpA--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10142024/30522.png" data-shot-text="Mackie Samoskevich shot on goal" aria-label="Mackie Samoskevich shot on goal 5:03" x="533.2" y="85.25" href="#missed"></use></g>
+				62410100<g><use fill="#041e42" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team1" data-period="1st" data-clock="16:37" data-player-id="nhl.p.6781" data-player-image="https://s.yimg.com/iu/api/res/1.2/QhfDM5ZrWMg1E5Q9FyHJmg--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10142024/6781.png" data-shot-text="A.J. Greer shot on goal" aria-label="A.J. Greer shot on goal 16:37" x="564.2" y="141.05" href="#missed"></use></g>
+				94580590<g><use fill="#041e42" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team1" data-period="2nd" data-clock="16:22" data-player-id="nhl.p.5981" data-player-image="https://s.yimg.com/iu/api/res/1.2/Z1gq_ttRmA6kF5IUMLUXeg--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10142024/5981.png" data-shot-text="Aleksander Barkov shot on goal" aria-label="Aleksander Barkov shot on goal 16:22" x="536.3" y="153.45" href="#missed"></use></g>
+				92893730<g><use fill="#041e42" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team1" data-period="2nd" data-clock="15:44" data-player-id="nhl.p.8652" data-player-image="https://s.yimg.com/iu/api/res/1.2/K6qse2FYYENT11MFlT.jyA--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10142024/8652.png" data-shot-text="Anton Lundell shot on goal" aria-label="Anton Lundell shot on goal 15:44" x="452.6" y="165.85" href="#missed"></use></g>
+				63532520<g><use fill="#041e42" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team1" data-period="1st" data-clock="17:48" data-player-id="nhl.p.6494" data-player-image="https://s.yimg.com/iu/api/res/1.2/7x.x8u6gYHXhZWf9rnGKfQ--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10142024/6494.png" data-shot-text="Gustav Forsling shot on goal" aria-label="Gustav Forsling shot on goal 17:48" x="430.9" y="218.55" href="#missed"></use></g>
+				62430100<g><use fill="#041e42" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team1" data-period="1st" data-clock="16:39" data-player-id="nhl.p.6781" data-player-image="https://s.yimg.com/iu/api/res/1.2/QhfDM5ZrWMg1E5Q9FyHJmg--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10142024/6781.png" data-shot-text="A.J. Greer shot on goal" aria-label="A.J. Greer shot on goal 16:39" x="582.8" y="147.25" href="#missed"></use></g>
+				57496490<g><use fill="#041e42" stroke="#fff" stroke-opacity="1" stroke-width="3" tabindex="0" class="made" data-team="team1" data-period="1st" data-clock="14:27" data-player-id="nhl.p.6370" data-player-image="https://s.yimg.com/iu/api/res/1.2/ILG_BmE.z7pKwSng0RNmpQ--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10142024/6370.png" data-shot-text="Sam Bennett 15 (Assists: A.J. Greer 7, Niko Mikkola 12)" aria-label="Sam Bennett 15 (Assists: A.J. Greer 7, Niko Mikkola 12) 14:27" x="570.4000000000001" y="125.55" href="#made"></use></g>
+				51495530<g><use fill="#041e42" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team1" data-period="1st" data-clock="7:58" data-player-id="nhl.p.7114" data-player-image="https://s.yimg.com/iu/api/res/1.2/BZbADP5lBat3VlYfl7_rEA--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10142024/7114.png" data-shot-text="Matthew Tkachuk shot on goal" aria-label="Matthew Tkachuk shot on goal 7:58" x="551.8" y="137.95" href="#missed"></use></g>
+				64562420<g><use fill="#041e42" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team1" data-period="1st" data-clock="19:31" data-player-id="nhl.p.8652" data-player-image="https://s.yimg.com/iu/api/res/1.2/K6qse2FYYENT11MFlT.jyA--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10142024/8652.png" data-shot-text="Anton Lundell shot on goal" aria-label="Anton Lundell shot on goal 19:31" x="520.8" y="32.55" href="#missed"></use></g>
+				55976700<g><use fill="#041e42" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team1" data-period="1st" data-clock="11:55" data-player-id="nhl.p.6062" data-player-image="https://s.yimg.com/iu/api/res/1.2/CFrIyL34V.PKSla_GLnLtA--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10142024/6062.png" data-shot-text="Carter Verhaeghe shot on goal" aria-label="Carter Verhaeghe shot on goal 11:55" x="576.6" y="165.85" href="#missed"></use></g>
+-->
+			</g>
+			<g transform="">
+<!--
+				42751610<g><use fill="#006d75" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team2" data-period="1st" data-clock="1:23" data-player-id="nhl.p.3829" data-player-image="https://s.yimg.com/iu/api/res/1.2/QOqZlbUYq9c6vDt9J2ExOA--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/11012023/3829.png" data-shot-text="Marc-Edouard Vlasic shot on goal" aria-label="Marc-Edouard Vlasic shot on goal 1:23" x="396.8" y="252.65" href="#missed"></use></g>
+				77492140<g><use fill="#006d75" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team2" data-period="2nd" data-clock="1:22" data-player-id="nhl.p.7578" data-player-image="https://s.yimg.com/iu/api/res/1.2/FEibxPsBeqSiPGy5WxutGw--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10162024/7578.png" data-shot-text="Fabian Zetterlund shot on goal" aria-label="Fabian Zetterlund shot on goal 1:22" x="570.4000000000001" y="125.55" href="#missed"></use></g>
+				44041350<g><use fill="#006d75" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team2" data-period="1st" data-clock="2:59" data-player-id="nhl.p.7123" data-player-image="https://s.yimg.com/iu/api/res/1.2/y83Amt8BZMQrPa4vEGwC0w--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10162024/7123.png" data-shot-text="Luke Kunin shot on goal" aria-label="Luke Kunin shot on goal 2:59" x="564.2" y="106.95" href="#missed"></use></g>
+				44051350<g><use fill="#006d75" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team2" data-period="1st" data-clock="3:00" data-player-id="nhl.p.7123" data-player-image="https://s.yimg.com/iu/api/res/1.2/y83Amt8BZMQrPa4vEGwC0w--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10162024/7123.png" data-shot-text="Luke Kunin shot on goal" aria-label="Luke Kunin shot on goal 3:00" x="567.3" y="131.75" href="#missed"></use></g>
+				49151380<g><use fill="#006d75" stroke="#fff" stroke-opacity="1" stroke-width="3" tabindex="0" class="made" data-team="team2" data-period="1st" data-clock="6:50" data-player-id="nhl.p.5695" data-player-image="https://s.yimg.com/iu/api/res/1.2/9UAk5_O6ywip4aCXigMOjw--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10162024/5695.png" data-shot-text="Cody Ceci 4 (Assists: Jake Walman 22)" aria-label="Cody Ceci 4 (Assists: Jake Walman 22) 6:50" x="514.6" y="131.75" href="#made"></use></g>
+				97360520<g><use fill="#006d75" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team2" data-period="2nd" data-clock="19:37" data-player-id="nhl.p.7123" data-player-image="https://s.yimg.com/iu/api/res/1.2/y83Amt8BZMQrPa4vEGwC0w--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10162024/7123.png" data-shot-text="Luke Kunin shot on goal" aria-label="Luke Kunin shot on goal 19:37" x="561.1" y="172.05" href="#missed"></use></g>
+				111368680<g><use fill="#006d75" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team2" data-period="3rd" data-clock="2:31" data-player-id="nhl.p.32763" data-player-image="https://s.yimg.com/iu/api/res/1.2/QUq4Ck27kAHpwRYSJAfeUA--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10082024/32763.png" data-shot-text="Macklin Celebrini shot on goal" aria-label="Macklin Celebrini shot on goal 2:31" x="440.20000000000005" y="215.45" href="#missed"></use></g>
+				97907000<g><use fill="#006d75" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team2" data-period="2nd" data-clock="19:56" data-player-id="nhl.p.6451" data-player-image="https://s.yimg.com/iu/api/res/1.2/7bdb6B1JNE8C0WB0VUmxiQ--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10162024/6451.png" data-shot-text="Jake Walman shot on goal" aria-label="Jake Walman shot on goal 19:56" x="455.70000000000005" y="237.15" href="#missed"></use></g>
+				109915430<g><use fill="#006d75" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team2" data-period="3rd" data-clock="0:56" data-player-id="nhl.p.30547" data-player-image="https://s.yimg.com/iu/api/res/1.2/3g5T10RLcVRT3Jv_fvl2FQ--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10082024/30547.png" data-shot-text="Will Smith shot on goal" aria-label="Will Smith shot on goal 0:56" x="508.4" y="221.65" href="#missed"></use></g>
+				51905630<g><use fill="#006d75" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team2" data-period="1st" data-clock="8:39" data-player-id="nhl.p.7123" data-player-image="https://s.yimg.com/iu/api/res/1.2/y83Amt8BZMQrPa4vEGwC0w--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10162024/7123.png" data-shot-text="Luke Kunin shot on goal" aria-label="Luke Kunin shot on goal 8:39" x="558" y="82.15" href="#missed"></use></g>
+				50315580<g><use fill="#006d75" stroke="#fff" stroke-opacity="1" stroke-width="3" tabindex="0" class="made" data-team="team2" data-period="1st" data-clock="7:22" data-player-id="nhl.p.30547" data-player-image="https://s.yimg.com/iu/api/res/1.2/3g5T10RLcVRT3Jv_fvl2FQ--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10082024/30547.png" data-shot-text="Will Smith 8 (Assists: Mario Ferraro 6, Fabian Zetterlund 18)" aria-label="Will Smith 8 (Assists: Mario Ferraro 6, Fabian Zetterlund 18) 7:22" x="561.1" y="79.05" href="#made"></use></g>
+				126970870<g><use fill="#006d75" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team2" data-period="3rd" data-clock="15:15" data-player-id="nhl.p.4969" data-player-image="https://s.yimg.com/iu/api/res/1.2/8ghdtGMGmtDUcwT4vrVheA--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10162024/4969.png" data-shot-text="Mikael Granlund shot on goal" aria-label="Mikael Granlund shot on goal 15:15" x="486.70000000000005" y="193.75" href="#missed"></use></g>
+				83551170<g><use fill="#006d75" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team2" data-period="2nd" data-clock="7:26" data-player-id="nhl.p.32763" data-player-image="https://s.yimg.com/iu/api/res/1.2/QUq4Ck27kAHpwRYSJAfeUA--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10082024/32763.png" data-shot-text="Macklin Celebrini shot on goal" aria-label="Macklin Celebrini shot on goal 7:26" x="564.2" y="88.35" href="#missed"></use></g>
+				89665170<g><use fill="#006d75" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team2" data-period="2nd" data-clock="12:01" data-player-id="nhl.p.30831" data-player-image="https://s.yimg.com/iu/api/res/1.2/vSkVchTqzNrOdz7uE5uusg--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/12312024/30831.png" data-shot-text="Nikolai Kovalenko shot on goal" aria-label="Nikolai Kovalenko shot on goal 12:01" x="573.5" y="156.55" href="#missed"></use></g>
+				48944260<g><use fill="#006d75" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team2" data-period="1st" data-clock="6:30" data-player-id="nhl.p.6451" data-player-image="https://s.yimg.com/iu/api/res/1.2/7bdb6B1JNE8C0WB0VUmxiQ--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10162024/6451.png" data-shot-text="Jake Walman shot on goal" aria-label="Jake Walman shot on goal 6:30" x="415.4" y="144.15" href="#missed"></use></g>
+				52875530<g><use fill="#006d75" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team2" data-period="1st" data-clock="10:16" data-player-id="nhl.p.32763" data-player-image="https://s.yimg.com/iu/api/res/1.2/QUq4Ck27kAHpwRYSJAfeUA--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10082024/32763.png" data-shot-text="Macklin Celebrini shot on goal" aria-label="Macklin Celebrini shot on goal 10:16" x="582.8" y="63.55" href="#missed"></use></g>
+				85868820<g><use fill="#006d75" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team2" data-period="2nd" data-clock="9:00" data-player-id="nhl.p.7564" data-player-image="https://s.yimg.com/iu/api/res/1.2/oAtuQJhe60HTSCKdY8asJg--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10162024/7564.png" data-shot-text="Mario Ferraro shot on goal" aria-label="Mario Ferraro shot on goal 9:00" x="434" y="94.55" href="#missed"></use></g>
+				126140410<g><use fill="#006d75" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team2" data-period="3rd" data-clock="15:00" data-player-id="nhl.p.7532" data-player-image="https://s.yimg.com/iu/api/res/1.2/cF39HwvG28vr5207In7xAg--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/11142024/7532.png" data-shot-text="Timothy Liljegren shot on goal" aria-label="Timothy Liljegren shot on goal 15:00" x="465" y="91.44999999999999" href="#missed"></use></g>
+				63762420<g><use fill="#006d75" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team2" data-period="1st" data-clock="18:11" data-player-id="nhl.p.5020" data-player-image="https://s.yimg.com/iu/api/res/1.2/sesvDCJ4IHWHWzpXPZWWuQ--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10082024/5020.png" data-shot-text="Tyler Toffoli shot on goal" aria-label="Tyler Toffoli shot on goal 18:11" x="496" y="48.05" href="#missed"></use></g>
+				97500520<g><use fill="#006d75" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team2" data-period="2nd" data-clock="19:51" data-player-id="nhl.p.7564" data-player-image="https://s.yimg.com/iu/api/res/1.2/oAtuQJhe60HTSCKdY8asJg--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10162024/7564.png" data-shot-text="Mario Ferraro shot on goal" aria-label="Mario Ferraro shot on goal 19:51" x="399.9" y="237.15" href="#missed"></use></g>
+				64652420<g><use fill="#006d75" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team2" data-period="1st" data-clock="19:40" data-player-id="nhl.p.30547" data-player-image="https://s.yimg.com/iu/api/res/1.2/3g5T10RLcVRT3Jv_fvl2FQ--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10082024/30547.png" data-shot-text="Will Smith shot on goal" aria-label="Will Smith shot on goal 19:40" x="564.2" y="125.55" href="#missed"></use></g>
+				78252040<g><use fill="#006d75" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team2" data-period="2nd" data-clock="2:38" data-player-id="nhl.p.8883" data-player-image="https://s.yimg.com/iu/api/res/1.2/0uy7.itSlFrZ7GVFvYIMcA--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10162024/8883.png" data-shot-text="William Eklund shot on goal" aria-label="William Eklund shot on goal 2:38" x="489.8" y="178.25" href="#missed"></use></g>
+				77492040<g><use fill="#006d75" stroke="none" stroke-width="1.5" tabindex="0" class="missed" data-team="team2" data-period="2nd" data-clock="1:22" data-player-id="nhl.p.7564" data-player-image="https://s.yimg.com/iu/api/res/1.2/oAtuQJhe60HTSCKdY8asJg--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10162024/7564.png" data-shot-text="Mario Ferraro shot on goal" aria-label="Mario Ferraro shot on goal 1:22" x="455.70000000000005" y="119.35" href="#missed"></use></g>
+-->
+			</g>
+			<!--g transform="translate(406.79998779296875,-74.45000076293945)" style="filter: url(&quot;#drop-shadow&quot;); opacity: 0;"><foreignObject pointer-events="none" height="125" width="352"><div class="H(125px) W(352px) D(f) Jc(fe) Fxd(c)"><div class="D(f) Mih(68px) Bxz(bb) Bdrs(40px) P(6px) Pend(20px) Bgc(#fff) W(100%)"><div class="Flx(n) W(56px) D(f) Jc(sa) Fld(c) Mend(12px)"><div class="Flx(n) H(56px) W(56px) Bdrs(50%) Ov(h) Bgp(c_b) Bgz(cv)" style="background-color: rgb(0, 109, 117);"><svg><image preserveAspectRatio="xMidYMax slice" height="56" width="56" href="https://s.yimg.com/iu/api/res/1.2/QUq4Ck27kAHpwRYSJAfeUA--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/10082024/32763.png"></image></svg></div></div><div class="Flx(1) C(black)"><div class="Fw(500) Pb(4px) smartphone_Fz(16px)">10:16 1st</div><div class="smartphone_Fz(18px) shotText">Macklin Celebrini shot on goal</div></div></div></div></foreignObject><path transform="translate(176, 125)" fill="#fff" d="M -8,-2 0,8 8,-2 Z"></path></g-->
+		</svg><br><br>
+	</div>
+		<button id="exportData">Export Data</button>
+		<pre id="dataOutput"></pre>
+		
+
+		<script>
+		    const shots = [{teamName:"Team",period:"Period",time:"Time",x:"x",y:"y",id:"ID",type:"Type"}];
+			
+			function initClickHandler() {
+				const rink = document.getElementById('rink');
+				const background = document.getElementById('shotchartBackground');
+				
+				rink.addEventListener('click', function(event) {
+					// Get the SVG's bounding rectangle
+					const svgRect = rink.getBoundingClientRect();
+					
+					// Calculate the scaling factors
+					const scaleX = 620 / svgRect.width;
+					const scaleY = 263.5 / svgRect.height;
+					
+					// Get click coordinates relative to the SVG viewport
+					const x = (event.clientX - svgRect.left) * scaleX;
+					const y = (event.clientY - svgRect.top) * scaleY;
+					
+					// Check if the click is within the background element bounds
+					if (x >= 0 && x <= 620 && y >= 0 && y <= 263.5) {
+						// Round to 2 decimal places for cleaner output
+						const roundedX = Math.round(x * 100) / 100;
+						const roundedY = Math.round(y * 100) / 100;
+						
+						//console.log(`Coordinates: x=${roundedX}, y=${roundedY}`);
+					}
+					
+					const team1color = document.getElementById('team1-color').value;
+					const team2color = document.getElementById('team2-color').value;
+					
+					// Create the elements
+					const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+					const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+					
+					const shotType = document.querySelector('input[name="shot-type"]:checked').value;
+					const teamSelected = document.querySelector('input[name="team-shot-entry"]:checked').value;
+					const period = document.querySelector('input[name="period"]:checked').value;
+					const time = document.getElementById('time-elapsed').value;
+					
+					// Set all the attributes
+					use.setAttribute("fill", teamSelected == "team1" ? team1color : team2color);
+					use.setAttribute("stroke", shotType == "missed" ? "none" : "#FFF");
+					use.setAttribute("stroke-width", shotType == "missed" ? "1.5" : "3");
+					//use.setAttribute("tabindex", "0");
+					use.setAttribute("class", shotType);
+					use.setAttribute("data-team", teamSelected);
+					use.setAttribute("data-period", period);
+					use.setAttribute("data-clock", time);
+					use.setAttribute("data-player-id", "nhl.p.3829");
+					//use.setAttribute("data-player-image", "https://s.yimg.com/iu/api/res/1.2/QOqZlbUYq9c6vDt9J2ExOA--~C/YXBwaWQ9eXNwb3J0cztoPTY3O3E9ODA7dz0xMDA-/https://s.yimg.com/xe/i/us/sp/v/nhl_cutout/players_l/11012023/3829.png");
+					use.setAttribute("data-shot-text", "Marc-Edouard Vlasic shot on goal");
+					use.setAttribute("aria-label", "Marc-Edouard Vlasic shot on goal 1:23");
+					use.setAttribute("x", -x + 620);
+					use.setAttribute("y", y);
+					use.setAttribute("href", "#" + shotType);
+					if (shotType != "missed") { use.setAttribute("stroke-opacity", "1"); }
+					
+					// Add the use element to the g element
+					g.appendChild(use);
+					
+					// Find the target group and add our new group to it
+					const targetGroup = document.getElementById("team1");
+					if (targetGroup) {
+						targetGroup.appendChild(g);
+					}
+					
+					// Add data to table
+					const jerseyNumber = document.getElementById('jerseyNumber').value;
+					var teamName = "";
+					if (teamSelected == "team1") {
+						teamName = document.getElementById('team1-name').value;
+					} else {
+						teamName = document.getElementById('team2-name').value;
+					}
+					const shot = {teamName:teamName,period:period,time:time,x:x,y:y,id:jerseyNumber,type:shotType};
+					shots.push(shot);
+				});
+			}
+			
+			document.getElementById('exportData').onclick = function() {
+				let data = 'Shot Data:\n';
+				shots.forEach(shot => {
+					data += `${shot.teamName},${shot.period},${shot.time},${shot.x},${shot.y},${shot.id},${shot.type}\n`;
+				});
+				document.getElementById('dataOutput').textContent = data;
+			};
+
+			// Call this function after the SVG is loaded
+			initClickHandler();
+		</script>
+	</body>
+</html>
