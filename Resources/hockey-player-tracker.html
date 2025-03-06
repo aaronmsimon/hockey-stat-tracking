@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hockey Shot & Player Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+
+    #app-container {
+      display: flex;
+      flex-direction: column;
+      max-width: 1240px;
+      margin: 0 auto;
+    }
+
+    #rink-container {
+      position: relative;
+      width: 1240px;
+      height: 527px;
+      margin: 20px auto;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .shot {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    .missed {
+      background-color: red;
+    }
+
+    .made {
+      background-color: green;
+    }
+
+    .team-settings {
+      margin: 10px 0;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px 15px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+    
+    /* Player management styles */
+    #player-management {
+      display: flex;
+      margin: 20px 0;
+      justify-content: space-between;
+    }
+    
+    .player-area {
+      border: 2px solid #333;
+      border-radius: 8px;
+      padding: 10px;
+      flex: 1;
+      margin: 0 10px;
+      min-height: 150px;
+      position: relative;
+    }
+    
+    #bench {
+      background-color: #f8f8f8;
+    }
+    
+    #ice {
+      background-color: #e6f7ff;
+    }
+    
+    .area-label {
+      position: absolute;
+      top: -12px;
+      left: 20px;
+      background-color: white;
+      padding: 0 10px;
+      font-weight: bold;
+    }
+    
+    .player {
+      display: inline-block;
+      position: relative;
+      width: 60px;
+      height: 80px;
+      margin: 8px;
+      cursor: move;
+    }
+    
+    .player svg {
+      width: 100%;
+      height: 80%;
+    }
+    
+    .player-number {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -100%);
+      font-size: 16px;
+      font-weight: bold;
+      user-select: none;
+    }
+    
+    .dragging {
+      opacity: 0.6;
+    }
+    
+    /* Player creation form */
+    #add-player-form {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    #add-player-form input {
+      padding: 8px;
+      margin-right: 10px;
+      width: 80px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    
+    #add-player-form select {
+      padding: 8px;
+      margin-right: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    
+    .player-team1 svg path {
+      fill: #ff0000;
+    }
+    
+    .player-team2 svg path {
+      fill: #0000ff;
+    }
+    
+    /* Style for player log */
+    #player-log {
+      margin: 20px 0;
+      max-height: 150px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: left;
+      font-size: 12px;
+    }
+    
+    .log-entry {
+      margin-bottom: 5px;
+      padding-bottom: 5px;
+      border-bottom: 1px dotted #eee;
+    }
+    
+    /* Tabs for different tool sections */
+    .tab-container {
+      margin-top: 15px;
+    }
+    
+    .tabs {
+      display: flex;
+      margin-bottom: 10px;
+    }
+    
+    .tab {
+      padding: 10px 20px;
+      background-color: #e0e0e0;
+      cursor: pointer;
+      border-radius: 5px 5px 0 0;
+      margin-right: 5px;
+    }
+    
+    .tab.active {
+      background-color: #007bff;
+      color: white;
+    }
+    
+    .tab-content {
+      display: none;
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 0 5px 5px 5px;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div id="app-container">
+    <h1>Hockey Shot & Player Tracker</h1>
+    
+    <div class="tab-container">
+      <div class="tabs">
+        <div class="tab active" data-tab="player-tab">Player Management</div>
+        <div class="tab" data-tab="shot-tab">Shot Tracking</div>
+      </div>
+      
+      <div id="player-tab" class="tab-content active">
+        <h2>Player Management</h2>
+        
+        <div id="add-player-form">
+          <label for="player-number">Jersey Number:</label>
+          <input type="number" id="player-number" min="0" max="99" required>
+          
+          <label for="player-name">Name (optional):</label>
+          <input type="text" id="player-name">
+          
+          <label for="player-team">Team:</label>
+          <select id="player-team">
+            <option value="team1">Team 1</option>
+            <option value="team2">Team 2</option>
+          </select>
+          
+          <button id="add-player-btn">Add Player</button>
+        </div>
+        
+        <div id="player-management">
+          <div id="bench" class="player-area" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <div class="area-label">Bench</div>
+            <!-- Players will be added here dynamically -->
+          </div>
+          
+          <div id="ice" class="player-area" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <div class="area-label">Ice</div>
+            <!-- Players will be dropped here -->
+          </div>
+        </div>
+        
+        <h3>Player Movement Log</h3>
+        <div id="player-log">
+          <!-- Log entries will be added here -->
+        </div>
+      </div>
+      
+      <div id="shot-tab" class="tab-content">
+        <h2>Shot Tracking</h2>
+        
+        <div class="team-settings">
+          <label>Team 1 Name: <input type="text" id="team1-name" placeholder="Team 1" /></label>
+          <label>Color: <input type="color" id="team1-color" value="#ff0000" /></label>
+          <input type="radio" id="team1-selected" name="team-shot-entry" value="team1" checked="checked">
+        </div>
+
+        <div class="team-settings">
+          <label>Team 2 Name: <input type="text" id="team2-name" placeholder="Team 2" /></label>
+          <label>Color: <input type="color" id="team2-color" value="#0000ff" /></label>
+          <input type="radio" id="team2-selected" name="team-shot-entry" value="team2">
+        </div>
+        
+        <label>Period
+          <input type="radio" id="period-1" name="period" value="1st" checked="checked">
+          <label for="period-1">1st</label>
+          <input type="radio" id="period-2" name="period" value="2nd">
+          <label for="period-2">2nd</label>
+          <input type="radio" id="period-3" name="period" value="3rd">
+          <label for="period-3">3rd</label>
+          <input type="radio" id="period-ot" name="period" value="Overtime">
+          <label for="period-ot">OT</label>
+          <input type="text" id="time-elapsed" placeholder="Time" size="5" style="margin-left: 10px;" />
+        </label><br><br>
+        
+        <label for="jerseyNumber">Jersey Number:</label>
+        <input type="text" id="jerseyNumber" size="5"><br><br>
+
+        <input type="radio" id="shot-missed" name="shot-type" value="missed" checked="checked">
+        <label for="shot-missed">Missed</label>
+        <input type="radio" id="shot-made" name="shot-type" value="made">
+        <label for="shot-made">Made</label><br>
+        
+        <div id="rink-container">
+          <svg id="rink" class="shotchart-svg" viewBox="0 0 620 263.5">
+            <defs>
+              <filter id="drop-shadow" x="-100%" y="-100%" width="300%" height="300%">
+                <feGaussianBlur in="SourceAlpha" stdDeviation="2"></feGaussianBlur>
+                <feOffset dy="2" result="offsetblur"></feOffset>
+                <feFlood style="flood-color: rgb(0, 0, 0); flood-opacity: 0.2;"></feFlood>
+                <feComposite in2="offsetblur" operator="in"></feComposite>
+                <feMerge>
+                  <feMergeNode></feMergeNode>
+                  <feMergeNode in="SourceGraphic"></feMergeNode>
+                </feMerge>
+              </filter>
+              <g id="made"><circle r="8" style="filter: url(&quot;#drop-shadow&quot;);"></circle><rect width="24" height="24" x="-12" y="-12" opacity="0"></rect></g>
+              <g id="missed"><path transform="scale(1.25)" d="m -4.425644,-6.7126989 c -0.7623521,0.7623517 -1.5247037,1.5247034 -2.2870554,2.2870551 1.4752116,1.4752144 2.9504324,2.9504327 4.4256444,4.4256443 -1.475212,1.475212 -2.9504328,2.950433 -4.4256444,4.425644 0.7623517,0.762352 1.5247033,1.524704 2.2870554,2.287055 C -2.950433,5.2374885 -1.475212,3.7622675 0,2.2870555 1.475212,3.7622675 2.950433,5.2374885 4.425644,6.7126995 5.187996,5.9503485 5.950348,5.1879965 6.712699,4.4256445 5.237488,2.9504335 3.762267,1.4752125 2.287055,5e-7 3.762267,-1.4752111 5.237488,-2.9504294 6.712699,-4.4256438 5.950348,-5.1879955 5.187996,-5.9503472 4.425644,-6.7126989 2.950433,-5.2374844 1.475212,-3.762269 0,-2.2870545 -1.475212,-3.762269 -2.950433,-5.2374844 -4.425644,-6.7126989 Z" style="filter: url(&quot;#drop-shadow&quot;);"></path><rect width="24" height="24" x="-12" y="-12" opacity="0"></rect></g>
+              <linearGradient id="baseGradient"><stop offset="0.6" stop-color="#fff" stop-opacity="1"></stop><stop offset="1" stop-color="#eceff3" stop-opacity="1"></stop></linearGradient>
+              <radialGradient gradientUnits="userSpaceOnUse" gradientTransform="matrix(1,0,0,0.425,0,75.75625)" r="310" fy="131.75" fx="310" cy="131.75" cx="310" id="radialGradient" href="#baseGradient"></radialGradient>
+              <clipPath id="shotChartClip"><rect height="263.5" width="620"></rect></clipPath>
+              <g id="shotchartBackground" clip-path=""><rect ry="70.842003" rx="86.071999" height="263.5" width="620" style="fill: url(&quot;#radialGradient&quot;); stroke: rgb(185, 189, 197); stroke-width: 2;"></rect><circle cx="310" cy="131.75" r="46.5" style="opacity: 0.64; stroke: rgb(204, 51, 51); stroke-width: 2; stroke-opacity: 1; fill: none;"></circle><path d="m 309.89289,0 0.21421,263.49931" style="fill: none; stroke: rgb(204, 51, 51); stroke-width: 3; stroke-opacity: 1; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; stroke-dasharray: 6, 6; stroke-dashoffset: 3.2;"></path><circle r="6.2323289" cy="131.75" cx="310" style="opacity: 0.64; stroke: none; fill: rgb(204, 51, 51);"></circle></g>
+              <g id="shotchartLines" clip-path="url(#shotChartClip)"><path d="m 198.2929,0 0.21421,263.49931" style="opacity: 0.64; stroke: rgb(68, 102, 187); stroke-width: 3; stroke-opacity: 1; fill: none;"></path><path d="M 35.102489,139.79334 24.38582,139.5806 v -16.6638 l 10.541793,-0.0709" style="opacity: 0.64; stroke: rgb(204, 51, 51); stroke-width: 2; stroke-opacity: 1; fill: none;"></path><path d="M 34.11879,15.367341 34.08121,247.27176" style="opacity: 0.64; stroke: rgb(204, 51, 51); stroke-width: 2; stroke-opacity: 1; fill: none;"></path><path d="m 34.240618,119.47097 c 14.639706,-0.039 15.125557,23.7977 -0.145268,23.69692" style="opacity: 0.64; stroke: rgb(204, 51, 51); stroke-width: 2; stroke-opacity: 1; fill: none;"></path><circle r="46.5" cy="62" cx="96.1" style="opacity: 0.64; stroke: rgb(204, 51, 51); stroke-width: 2; stroke-opacity: 1; fill: none;"></circle><circle cx="96.1" cy="62" r="6.2323289" style="opacity: 0.64; stroke: none; fill: rgb(204, 51, 51);"></circle><path d="M 100.75,107.50001 V 117.5" style="opacity: 0.64; stroke: rgb(204, 51, 51); stroke-width: 2; stroke-opacity: 1; fill: none;"></path><path d="m 91.449999,107.50001 0,10" style="opacity: 0.64; stroke: rgb(204, 51, 51); stroke-width: 2; stroke-opacity: 1; fill: none;"></path><path d="M 100.75,6.5202958 V 16.520291" style="opacity: 0.64; stroke: rgb(204, 51, 51); stroke-width: 2; stroke-opacity: 1; fill: none;"></path><path d="m 91.449999,6.5202958 0,10" style="opacity: 0.64; stroke: rgb(204, 51, 51); stroke-width: 2; stroke-opacity: 1; fill: none;"></path><circle cx="96.1" cy="201.5" r="46.5" style="opacity: 0.64; stroke: rgb(204, 51, 51); stroke-width: 2; stroke-opacity: 1; fill: none;"></circle><circle r="6.2323289" cy="201.5" cx="96.1" style="opacity: 0.64; stroke: none; fill: rgb(204, 51, 51);"></circle><path d="m 100.75,247 v 10" style="opacity: 0.64; stroke: rgb(204, 51, 51); stroke-width: 2; stroke-opacity: 1; fill: none;"></path><path d="m 91.45,247 0,10" style="opacity: 0.64; stroke: rgb(204, 51, 51); stroke-width: 2; stroke-opacity: 1; fill: none;"></path><path d="m 100.75,146.0203 v 10" style="opacity: 0.64; stroke: rgb(204, 51, 51); stroke-width: 2; stroke-opacity: 1; fill: none;"></path><path d="m 91.45,146.0203 0,10" style="opacity: 0.64; stroke: rgb(204, 51, 51); stroke-width: 2; stroke-opacity: 1; fill: none;"></path></g>
+            </defs>
+            <use id="shotchartBackgroundUse" href="#shotchartBackground"></use>
+            <use href="#shotchartLines" fill="#000" transform="scale(-1, 1) translate(-620)"></use>
+            <use href="#shotchartLines" fill="#000"></use>
+            <g id="team1" transform="scale(-1, 1) translate(-620)"></g>
+            <g id="team2" transform=""></g>
+          </svg>
+        </div>
+          
+        <button id="exportData">Export Shot Data</button>
+        <pre id="dataOutput"></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- SVG Template for T-shirt -->
+  <template id="tshirt-template">
+    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60.674 60.674" xml:space="preserve">
+      <path style="fill:#010002;" d="M46.682,6.95c-0.675-0.675-1.813-1.147-2.768-1.147h-5.818c-0.134,0-1.318,0.04-1.516,1.438
+        c-0.02,0.14-0.05,0.351-0.121,0.56c-0.473,1.384-2.979,2.815-6.353,2.815s-5.88-1.432-6.353-2.815
+        c-0.408-1.194-1.446-1.997-2.584-1.997h-5.397c-0.627,0-0.627,0-6.953,6.322l-8.086,8.082C0.261,20.68,0.001,21.308,0,21.975
+        c0,0.669,0.259,1.297,0.732,1.77l7.714,7.716c0.944,0.945,2.59,0.945,3.536,0l2.289-2.29v23.2c0,1.379,1.122,2.5,2.5,2.5h26.854
+        c1.378,0,2.5-1.121,2.5-2.5V28.892l2.568,2.568c0.944,0.945,2.591,0.945,3.535,0l7.714-7.716c0.472-0.472,0.732-1.1,0.732-1.768
+        s-0.26-1.296-0.732-1.767L46.682,6.95z M10.214,28.985l-7.007-7.008c0.571-0.571,1.199-1.199,1.857-1.857l7.103,6.912
+        L10.214,28.985z M44.924,24.252c-0.894,0-1.799,0.692-1.799,2.018v25.601H17.271V26.548c0-1.325-0.905-2.017-1.799-2.017
+        c-0.367,0-0.919,0.115-1.469,0.664l-1.128,1.129l-7.103-6.911C9.87,15.316,14.91,10.28,16.39,8.805h4.536
+        c0.993,2.835,4.76,4.813,9.18,4.813s8.188-1.978,9.18-4.813h4.628c0.162,0.002,0.531,0.155,0.647,0.268l10.473,10.472
+        l-7.103,6.911l-1.538-1.54C45.844,24.367,45.291,24.252,44.924,24.252z M50.46,28.985l-1.823-1.823l7.104-6.912l1.727,1.727
+        L50.46,28.985z"/>
+    </svg>
+  </template>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize variables
+      const shots = [{teamName:"Team",period:"Period",time:"Time",x:"x",y:"y",id:"ID",type:"Type"}];
+      const playerLog = document.getElementById('player-log');
+      const bench = document.getElementById('bench');
+      const ice = document.getElementById('ice');
+      let playerCount = 0;
+      let activePlayers = {};
+      
+      // Tab switching functionality
+      const tabs = document.querySelectorAll('.tab');
+      const tabContents = document.querySelectorAll('.tab-content');
+      
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const tabId = tab.getAttribute('data-tab');
+          
+          // Remove active class from all tabs and contents
+          tabs.forEach(t => t.classList.remove('active'));
+          tabContents.forEach(content => content.classList.remove('active'));
+          
+          // Add active class to clicked tab and corresponding content
+          tab.classList.add('active');
+          document.getElementById(tabId).classList.add('active');
+        });
+      });
+      
+      // Player management functionality
+      document.getElementById('add-player-btn').addEventListener('click', function() {
+        const playerNumber = document.getElementById('player-number').value;
+        const playerName = document.getElementById('player-name').value;
+        const playerTeam = document.getElementById('player-team').value;
+        
+        if (!playerNumber) {
+          alert('Please enter a jersey number');
+          return;
+        }
+        
+        // Check if player number already exists in the same team
+        const existingPlayers = document.querySelectorAll(`.player-${playerTeam}`);
+        for (let i = 0; i < existingPlayers.length; i++) {
+          if (existingPlayers[i].getAttribute('data-number') === playerNumber) {
+            alert(`Player with jersey number ${playerNumber} already exists in this team!`);
+            return;
+          }
+        }
+        
+        // Create a new player element
+        createPlayer(playerNumber, playerName, playerTeam);
+        
+        // Log the action
+        logPlayerAction(`Added player #${playerNumber}${playerName ? ' (' + playerName + ')' : ''} to ${playerTeam === 'team1' ? 'Team 1' : 'Team 2'}`);
+        
+        // Reset form
+        document.getElementById('player-number').value = '';
+        document.getElementById('player-name').value = '';
+      });
+      
+      // Function to create a player element
+      function createPlayer(number, name, team) {
+        const playerId = `player-${team}-${number}-${playerCount++}`;
+        const playerDiv = document.createElement('div');
+        playerDiv.className = `player player-${team}`;
+        playerDiv.id = playerId;
+        playerDiv.setAttribute('draggable', true);
+        playerDiv.setAttribute('data-number', number);
+        playerDiv.setAttribute('data-name', name || '');
+        playerDiv.setAttribute('data-team', team);
+        
+        // Clone the t-shirt template
+        const tshirtTemplate = document.getElementById('tshirt-template');
+        const tshirtSvg = tshirtTemplate.content.cloneNode(true);
+        
+        // Add the jersey number
+        const numberDiv = document.createElement('div');
+        numberDiv.className = 'player-number';
+        numberDiv.textContent = number;
+        
+        playerDiv.appendChild(tshirtSvg);
+        playerDiv.appendChild(numberDiv);
+        
+        // Add drag event listeners
+        playerDiv.addEventListener('dragstart', dragStart);
+        playerDiv.addEventListener('dragend', dragEnd);
+        
+        // Add player to bench
+        bench.appendChild(playerDiv);
+        
+        // Store player in active players
+        activePlayers[playerId] = {
+          id: playerId,
+          number: number,
+          name: name || '',
+          team: team,
+          location: 'bench',
+          timeAdded: new Date()
+        };
+        
+        return playerDiv;
+      }
+      
+      // Drag and drop functionality
+      function dragStart(e) {
+        e.dataTransfer.setData('text/plain', e.target.id);
+        setTimeout(() => e.target.classList.add('dragging'), 0);
+      }
+      
+      function dragEnd(e) {
+        e.target.classList.remove('dragging');
+      }
+      
+      function allowDrop(e) {
+        e.preventDefault();
+      }
+      
+      function drop(e) {
+        e.preventDefault();
+        const playerId = e.dataTransfer.getData('text/plain');
+        const player = document.getElementById(playerId);
+        
+        if (!player) return;
+        
+        // Get target area (bench or ice)
+        const targetArea = e.target.closest('.player-area');
+        if (!targetArea) return;
+        
+        // Move player to the target area
+        targetArea.appendChild(player);
+        
+        // Log the move
+        const playerData = activePlayers[playerId];
+        const fromArea = playerData.location;
+        const toArea = targetArea.id;
+        playerData.location = toArea;
+        
+        // Only log if the player actually changed areas
+        if (fromArea !== toArea) {
+          const playerName = playerData.name ? playerData.name : `#${playerData.number}`;
+          const teamName = playerData.team === 'team1' ? 'Team 1' : 'Team 2';
+          logPlayerAction(`Moved ${teamName} player ${playerName} from ${fromArea} to ${toArea}`);
+        }
+      }
+      
+      // Function to log player actions
+      function logPlayerAction(message) {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString();
+        const logEntry = document.createElement('div');
+        logEntry.className = 'log-entry';
+        logEntry.textContent = `[${timeStr}] ${message}`;
+        playerLog.insertBefore(logEntry, playerLog.firstChild);
+      }
+      
+      // Function to initialize the rink click handler for shot tracking
+      function initRinkClickHandler() {
+        const rink = document.getElementById('rink');
+        
+        rink.addEventListener('click', function(event) {
+          // Only process clicks when in shot tracking tab
+          if (!document.getElementById('shot-tab').classList.contains('active')) return;
+          
+          // Get the SVG's bounding rectangle
+          const svgRect = rink.getBoundingClientRect();
+          
+          // Calculate the scaling factors
+          const scaleX = 620 / svgRect.width;
+          const scaleY = 263.5 / svgRect.height;
+          
+          // Get click coordinates relative to the SVG viewport
+          const x = (event.clientX - svgRect.left) * scaleX;
+          const y = (event.clientY - svgRect.top) * scaleY;
+          
+          // Check if the click is within the background element bounds
+          if (x >= 0 && x <= 620 && y >= 0 && y <= 263.5) {
+            const team1color = document.getElementById('team1-color').value;
+            const team2color = document.getElementById('team2-color').value;
+            
+            // Create the elements
+            const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+            
+            const shotType = document.querySelector('input[name="shot-type"]:checked').value;
+            const teamSelected = document.querySelector('input[name="team-shot-entry"]:checked').value;
+            const period = document.querySelector('input[name="period"]:checked').value;
+            const time = document.getElementById('time-elapsed').value;
+            
+            // Set all the attributes
+            use.setAttribute("fill", teamSelected == "team1" ? team1color : team2color);
+            use.setAttribute("stroke", shotType == "missed" ? "none" : "#FFF");
+            use.setAttribute("stroke-width", shotType == "missed" ? "1.5" : "3");
+            //use.setAttribute("tabindex", "0");
+            use.setAttribute("class", shotType);
+            use.setAttribute("data-team", teamSelected);
+            use.setAttribute("data-period", period);
+            use.setAttribute("data-clock", time);
+            
+            // Set player jersey number
+            const jerseyNumber = document.getElementById('jerseyNumber').value;
+            use.setAttribute("data-player-id", jerseyNumber);
+            
+            // Create shot text
+            const shotText = `Jersey #${jerseyNumber} ${shotType} shot`;
+            use.setAttribute("data-shot-text", shotText);
+            use.setAttribute("aria-label", `${shotText} ${time}`);
+            
+            // Position the shot marker (flip x for team1 due to the scale transformation)
+            if (teamSelected === "team1") {
+              use.setAttribute("x", -x + 620);
+            } else {
+              use.setAttribute("x", x);
+            }
+            use.setAttribute("y", y);
+            use.setAttribute("href", "#" + shotType);
+            
+            if (shotType !== "missed") { 
+              use.setAttribute("stroke-opacity", "1"); 
+            }
+            
+            // Add the use element to the g element
+            g.appendChild(use);
+            
+            // Find the target group and add our new group to it
+            const targetGroup = document.getElementById(teamSelected);
+            if (targetGroup) {
+              targetGroup.appendChild(g);
+            }
+            
+            // Add data to table
+            var teamName = "";
+            if (teamSelected === "team1") {
+              teamName = document.getElementById('team1-name').value || "Team 1";
+            } else {
+              teamName = document.getElementById('team2-name').value || "Team 2";
+            }
+            const shot = {teamName: teamName, period: period, time: time, x: x, y: y, id: jerseyNumber, type: shotType};
+            shots.push(shot);
+            
+            // Find if there's a player on ice with this jersey number for the selected team
+            const playersOnIce = ice.querySelectorAll(`.player-${teamSelected}`);
+            let playerFound = false;
+            
+            playersOnIce.forEach(player => {
+              if (player.getAttribute('data-number') === jerseyNumber) {
+                playerFound = true;
+                const playerName = player.getAttribute('data-name') || `#${jerseyNumber}`;
+                const action = shotType === 'made' ? 'scored' : 'took a shot';
+                logPlayerAction(`${playerName} ${action} at ${time} in ${period} period`);
+              }
+            });
+            
+            // If player isn't on ice, log a warning
+            if (!playerFound && jerseyNumber) {
+              logPlayerAction(`Warning: Player #${jerseyNumber} is not on ice but recorded a shot`);
+            }
+          }
+        });
+      }
+      
+      // Function to export shot data
+      document.getElementById('exportData').addEventListener('click', function() {
+        let data = 'Shot Data:\n';
+        shots.forEach(shot => {
+          data += `${shot.teamName},${shot.period},${shot.time},${shot.x},${shot.y},${shot.id},${shot.type}\n`;
+        });
+        document.getElementById('dataOutput').textContent = data;
+        
+        // Also create a downloadable file
+        const blob = new Blob([data], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'hockey_shot_data.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+      
+      // Function to export player data
+      function exportPlayerData() {
+        const playerData = {
+          timestamp: new Date().toISOString(),
+          players: Object.values(activePlayers),
+          playersOnIce: Array.from(ice.querySelectorAll('.player')).map(el => el.id),
+          playersOnBench: Array.from(bench.querySelectorAll('.player')).map(el => el.id)
+        };
+        
+        const blob = new Blob([JSON.stringify(playerData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'hockey_player_data.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+      
+      // Add export player data button
+      const exportPlayerBtn = document.createElement('button');
+      exportPlayerBtn.textContent = 'Export Player Data';
+      exportPlayerBtn.addEventListener('click', exportPlayerData);
+      document.getElementById('player-tab').appendChild(exportPlayerBtn);
+      
+      // Initialize the application
+      initRinkClickHandler();
+      window.allowDrop = allowDrop; // Make the function globally available for the ondragover attribute
+      window.drop = drop; // Make the function globally available for the ondrop attribute
+    });
+  </script>
+</body>
+</html>
