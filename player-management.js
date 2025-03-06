@@ -9,7 +9,12 @@ $(document).ready(function() {
 	// Player management functionality
 	$('#add-player-btn').click(function() {
 		const playerNumber = $('#player-number').val();
-		const playerTeam = $('#player-team').val();
+		var playerTeam;
+		if ($('#player-team').val() != 'Opponent') {
+			playerTeam = $('#player-team').val();
+		} else {
+			playerTeam = $('#opponent-team').val();
+		}
 
 		if (!playerNumber) {
 			alert('Please enter a jersey number');
@@ -17,10 +22,10 @@ $(document).ready(function() {
 		}
 
 		// Check if player number already exists in the same team
-		const existingPlayers = $(`.player-${playerTeam}`);
+		const existingPlayers = $(`.player-${playerTeam.replace(' ','')}`);
 		for (let i = 0; i < existingPlayers.length; i++) {
-			if (existingPlayers[i].getAttribute('data-number') === playerNumber) {
-				alert(`Player with jersey number ${playerNumber} already exists in this team!`);
+			if (existingPlayers[i].getAttribute('data-player-number') === playerNumber) {
+				alert(`Player with jersey number ${playerNumber} already exists on the ${playerTeam}`);
 				return;
 			}
 		}
@@ -35,14 +40,19 @@ $(document).ready(function() {
 	// Function to create a player element
 	function createPlayer(number, team) {
 		// Set up new div for Player
-		const playerId = `player-${team}-${number}-${playerCount++}`;
+		const playerId = `player-${team.replace(' ','')}-${number}-${playerCount++}`;
 		var playerDiv = $('<div>', {
 			'id': playerId,
-			'class': `player player-${team}`,
+			'class': `player player-${team.replace(' ','')}`,
 			'data-player-number': number,
 			'data-team': team
 		}).draggable({ revert: "invalid" });
-		$('#bench').append(playerDiv);
+		
+		if ($('#player-team').val() != 'Opponent') {
+			$('#bench').append(playerDiv);
+		} else {
+			$('#opponents').append(playerDiv);
+		}
 		
 		// Clone the t-shirt template
         const tshirtTemplate = document.getElementById('tshirt-template');
@@ -56,47 +66,8 @@ $(document).ready(function() {
 		
 		playerDiv.append(tshirtSvg).append(numberDiv);
 		
-		// Add player to bench
-		bench.append(playerDiv);
-		
 		// Store player in active players
-		activePlayers[playerId] = {
-			id: playerId,
-			number: number,
-			team: team,
-			location: 'bench',
-			timeAdded: new Date()
-		};
-		
 		/*
-		const playerId = `player-${team}-${number}-${playerCount++}`;
-		const playerDiv = $('div');
-		playerDiv.className = `player player-${team}`;
-		playerDiv.id = playerId;
-		playerDiv.attr('draggable', true);
-		playerDiv.attr('data-number', number);
-		playerDiv.attr('data-team', team);
-
-		// Clone the t-shirt template
-		const tshirtTemplate = $('#tshirt-template');
-		const tshirtSvg = tshirtTemplate.children().clone(true, true);
-
-		// Add the jersey number
-		const numberDiv = $('div');
-		numberDiv.className = 'player-number';
-		numberDiv.textContent = number;
-
-		playerDiv.append(tshirtSvg);
-		playerDiv.append(numberDiv);
-
-		// Add drag event listeners
-		playerDiv.on('dragstart', dragStart);
-		playerDiv.on('dragend', dragEnd);
-
-		// Add player to bench
-		bench.append(playerDiv);
-
-		// Store player in active players
 		activePlayers[playerId] = {
 			id: playerId,
 			number: number,
@@ -104,8 +75,6 @@ $(document).ready(function() {
 			location: 'bench',
 			timeAdded: new Date()
 		};
-
-		return playerDiv;
 		*/
 	}
 	

@@ -91,6 +91,9 @@ button:hover {
 .hidden {
 	display: none;
 }
+.inline {
+	display: inline;
+}
 
     .timer-container {
       display: flex;
@@ -376,9 +379,12 @@ button:hover {
 
 /* Selected state */
 .player.selected svg {
-    filter: drop-shadow(0 0 5px #fff) drop-shadow(0 0 8px #4a90e2);
+    filter: drop-shadow(0 0 5px #fff) drop-shadow(0 0 8px #000);
     transform: scale(1.05);
     transition: all 0.2s ease;
+}
+#opponents .player.selected svg {
+    filter: drop-shadow(0 0 5px #fff) drop-shadow(0 0 8px #4a90e2);
 }
 
 .table-game-events { display: block; }
@@ -391,3 +397,14 @@ button:hover {
 .table-game-events .additional-info { width: 125px; padding: 5px 10px; }
 .table-game-events .location { width: 85px; padding: 5px 10px; }
 .table-game-events .controls { width: 75px; padding: 5px 10px; }
+
+form label {
+	display: inline;
+	margin-right: 10px;
+}
+form select {
+	margin-right: 10px;
+}
+form input {
+	margin-right: 10px;
+}

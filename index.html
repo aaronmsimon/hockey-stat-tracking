@@ -115,19 +115,30 @@
 			<option value="Takeaway">Takeaway</option>
 			<option value="Won faceoff against">Won faceoff against</option>
 		</select>
+		<div id="additional-info-input" class="hidden">
+			<label for="additional-info"></label>
+			<input type="text" id="additional-info">
+		</div>
+		<div id="faceoff-winner-selection" class="hidden">
+			<label for="faceoff-winner">Winner</label>
+			<select id="faceoff-winner" class="form-select" aria-label="Default select example">
+				<option value="Da Beers" selected>Da Beers</option>
+				<option value="Opponent">Opponent</option>
+			</select>
+		</div>
 		<div id="location-selection" class="hidden">
 			<label for="loc">Loc</label>
 			<select id="loc" class="form-select" aria-label="Default select example">
 				<option selected>Select an Loc</option>
-				<option value="1">c</option>
-				<option value="2">ol</option>
-				<option value="3">or</option>
-				<option value="4">nol</option>
-				<option value="5">nor</option>
-				<option value="6">ndl</option>
-				<option value="7">ndr</option>
-				<option value="8">dl</option>
-				<option value="9">dr</option>
+				<option value="c">c</option>
+				<option value="ol">ol</option>
+				<option value="or">or</option>
+				<option value="nol">nol</option>
+				<option value="nor">nor</option>
+				<option value="ndl">ndl</option>
+				<option value="ndr">ndr</option>
+				<option value="dl">dl</option>
+				<option value="dr">dr</option>
 			</select>
 		</div>
 		<input type="hidden" id="editIndex" name="editIndex" value="-1">
@@ -162,8 +173,8 @@
 		</tr>
 		<tr>
 			<td>
-			  <label for="opponent">Opponent
-			  <select id="opponent" class="form-select">
+			  <label for="opponent-team">Opponent
+			  <select id="opponent-team" class="form-select">
 				<option value="BrewJays">BrewJays</option>
 				<option value="Yeti">Yeti</option>
 				<option value="Aggies">Aggies</option>
@@ -179,7 +190,7 @@
 					  <label for="player-team">Team:</label>
 					  <select id="player-team">
 						<option value="Da Beers">Da Beers</option>
-						<option value="opponent">Opponent</option>
+						<option value="Opponent">Opponent</option>
 					  </select>
 					  
 					  <button id="add-player-btn">Add Player</button>
@@ -197,12 +208,10 @@
 					  </div>
 					</div>
 					
-					<div id="player-management">
 					  <div id="opponents" class="player-area">
 						<div class="area-label">Opponent</div>
 						<!-- Players will be added here dynamically -->
 					  </div>
-					</div>
 			  </div>
 			</td>
 			<td>
@@ -234,9 +243,9 @@
 				</svg>
 				<div class="period-container">
 					<div class="period-option">
-					  <input type="radio" id="sog" name="shot" value="sog" checked>
+					  <input type="radio" id="sog" name="shot-type" value="Shot on Goal" checked>
 					  <label for="sog">SOG</label>
-					  <input type="radio" id="goal" name="shot" value="goal">
+					  <input type="radio" id="goal" name="shot-type" value="Goal">
 					  <label for="goal">Goal</label>
 					</div>
 				</div>
@@ -245,6 +254,8 @@
 	</table>
 	<button id="exportButton">Export Data</button>
 	<button id="clearDataButton">Clear Data</button>
+	
+	<script src="shot-tracker.js"></script>
 	
   <!-- SVG Template for T-shirt -->
   <template id="tshirt-template">

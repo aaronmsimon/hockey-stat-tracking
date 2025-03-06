@@ -13,10 +13,12 @@ $(document).ready(function() {
 			const videoTime = '0:' + $('#video-minutes').val() + ':' + $('#video-seconds').val();
 			var team;
 			var player;
-			$('.player').each(function(index) {
-				$(this).removeClass('selected');
-				team = $(this).attr('data-team');
-				player = $(this).attr('data-player-number');
+			$('.player-DaBeers').each(function(index) {
+				if ($(this).hasClass('selected')) {
+					$(this).removeClass('selected');
+					team = $(this).attr('data-team');
+					player = $(this).attr('data-player-number');
+				}
 			});
 			const period = $('input[name="period"]:checked').val();
 			const gameTime = '0:' + $('#game-minutes').val() + ':' + $('#game-seconds').val();
@@ -44,6 +46,39 @@ $(document).ready(function() {
 							);
 						});
 						break;
+					case 'Penalty':
+						addEvent(
+							videoTime,
+							team,
+							period,
+							gameTime,
+							player,
+							gameEvent,
+							$('#additional-info').val(),
+							location
+						);
+						break;
+					case 'Won faceoff against':
+						var loser;
+						if ($('#faceoff-winner').val() != 'Opponent') {
+							loser = $('.player-' + $('#opponent-team').val() + '.selected').attr('data-player-number');
+						} else {
+							loser = player;
+							player = $('.player-' + $('#opponent-team').val() + '.selected').attr('data-player-number');
+							team = $('.player-' + $('#opponent-team').val() + '.selected').attr('data-team');
+						}
+						addEvent(
+							videoTime,
+							team,
+							period,
+							gameTime,
+							player,
+							gameEvent,
+							loser,
+							$('#loc').val()
+						);
+						$('.player-' + $('#opponent-team').val() + '.selected').removeClass('selected');
+						break;
 					default:
 						addEvent(
 							videoTime,
@@ -63,6 +98,7 @@ $(document).ready(function() {
 				$('#cancelButton').addClass('hidden');
 			}
 			document.getElementById('dataForm').reset();
+			eventAdditions();
 		});
 
 		// Edit item
@@ -114,6 +150,27 @@ $(document).ready(function() {
 
 		// Initial data load
 		loadData();
+		
+		// Select Event with additional fields
+		$('#event').click(eventAdditions);
+		
+		function eventAdditions() {
+			switch ($('#event').val()) {
+				case 'Won faceoff against':
+					$('#location-selection').removeClass('hidden').addClass('inline');
+					$('#faceoff-winner-selection').removeClass('hidden').addClass('inline');
+					break;
+				case 'Penalty':
+					$('#additional-info-input').removeClass('hidden').addClass('inline');
+					$('#additional-info-input label').text('Minutes');
+					$('#additional-info').css('width','40px');
+					break;
+				default:
+					$('#location-selection').removeClass('inline').addClass('hidden');
+					$('#faceoff-winner-selection').removeClass('inline').addClass('hidden');
+					$('#additional-info-input').removeClass('inline').addClass('hidden');
+			}			
+		}
 		
 		// Function to adjust time when arrows are clicked
 		function adjustTime(timer, unit, amount) {
