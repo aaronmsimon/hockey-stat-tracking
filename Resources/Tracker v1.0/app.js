@@ -6,9 +6,14 @@ $(document).ready(function() {
 			data.forEach((item, index) => {
 				const row = $('<tr>');
 				row.html(`
-					<td>${item.column1}</td>
-					<td>${item.column2}</td>
-					<td>${item.column3}</td>
+					<td>${item.videotime}</td>
+					<td>${item.team}</td>
+					<td>${item.period}</td>
+					<td>${item.gametime}</td>
+					<td>${item.player}</td>
+					<td>${item.gameevent}</td>
+					<td>${item.additionalinfo}</td>
+					<td>${item.location}</td>
 					<td>
 						<button id="row_${index}" class="editButton"><i class="fas fa-pencil-alt"></i></button>
 						<button class="deleteButton"><i class="fas fa-trash-alt"></i></button>
@@ -33,7 +38,16 @@ $(document).ready(function() {
 			const index = parseInt($('#editIndex').val());
 			if (index === -1) {
 				// Add new item
-				data.push({ column1: $('#column1').val(), column2: $('#column2').val(), column3: $('#column3').val() });
+				data.push({
+					videotime: '0:' + $('#video-minutes').val() + ':' + $('#video-seconds').val(),
+					team: '',
+					period: $('input[name="period"]:checked').val(),
+					gametime: '0:' + $('#game-minutes').val() + ':' + $('#game-seconds').val(),
+					player: '',
+					gameevent: '',
+					additionalinfo: '',
+					location: ''
+				});
 			} else {
 				// Edit existing item
 				data[index] = { column1: $('#column1').val(), column2: $('#column2').val(), column3: $('#column3').val() };
@@ -94,4 +108,61 @@ $(document).ready(function() {
 
 		// Initial data load
 		loadData();
+		
+		// Function to adjust time when arrows are clicked
+		function adjustTime(timer, unit, amount) {
+		  const minutesElem = $('#' + timer + '-minutes');
+		  const secondsElem = $('#' + timer + '-seconds');
+		  
+		  let minutes = parseInt(minutesElem.val()) || 0;
+		  let seconds = parseInt(secondsElem.val()) || 0;
+		  
+		  if (unit === 'minutes') {
+			minutes += amount;
+		  } else {
+			seconds += amount;
+		  }
+		  
+		  // Handle overflow/underflow
+		  if (seconds >= 60) {
+			minutes += 1;
+			seconds -= 60;
+		  } else if (seconds < 0) {
+			minutes -= 1;
+			seconds += 60;
+		  }
+		  
+		  // Ensure minutes is always positive
+		  if (minutes < 0) minutes = 0;
+		  
+		  // Format and set the values
+		  minutesElem.val(minutes.toString());
+		  secondsElem.val(seconds.toString().padStart(2, '0'));
+		}
+		
+		$('#video-minutes-plus').click(function() {
+			adjustTime('video','minutes', 1);
+		});		
+		$('#video-minutes-minus').click(function() {
+			adjustTime('video','minutes', -1);
+		});
+		$('#video-seconds-plus').click(function() {
+			adjustTime('video','seconds', 1);
+		});		
+		$('#video-seconds-minus').click(function() {
+			adjustTime('video','seconds', -1);
+		});
+		
+		$('#game-minutes-plus').click(function() {
+			adjustTime('game','minutes', 1);
+		});		
+		$('#game-minutes-minus').click(function() {
+			adjustTime('game','minutes', -1);
+		});
+		$('#game-seconds-plus').click(function() {
+			adjustTime('game','seconds', 1);
+		});		
+		$('#game-seconds-minus').click(function() {
+			adjustTime('game','seconds', -1);
+		});
 });
