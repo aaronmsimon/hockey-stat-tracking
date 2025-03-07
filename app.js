@@ -132,6 +132,7 @@ $(document).ready(function() {
 
 		// Export data
 		$('#exportButton').click(function() {
+			/*
 			const data = JSON.parse(localStorage.getItem('gameEvents')) || [];
 			const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
 			const url = URL.createObjectURL(blob);
@@ -140,6 +141,9 @@ $(document).ready(function() {
 			a.download = 'data.json';
 			a.click();
 			URL.revokeObjectURL(url);
+			*/
+			const csvData = jsonToCsv(JSON.parse(localStorage.getItem('gameEvents')) || []);
+			downloadCsv(csvData, 'game-events.csv');
 		});
 		
 		// Remove all data
