@@ -1,4 +1,7 @@
 $(document).ready(function() {
+	var gameTimeMinutes = 20;
+	var gameTimeSeconds = 0;
+	
 		// Button actions
 		$('.editButton').click(function() {
 			editItem(item, index);
@@ -59,13 +62,14 @@ $(document).ready(function() {
 						);
 						break;
 					case 'Won faceoff against':
+						var opponentTeam = $('#opponent-team').val().replace(' ','');
 						var loser;
 						if ($('#faceoff-winner').val() != 'Opponent') {
-							loser = $('.player-' + $('#opponent-team').val() + '.selected').attr('data-player-number');
+							loser = $('.player-' + opponentTeam + '.selected').attr('data-player-number');
 						} else {
 							loser = player;
-							player = $('.player-' + $('#opponent-team').val() + '.selected').attr('data-player-number');
-							team = $('.player-' + $('#opponent-team').val() + '.selected').attr('data-team');
+							player = $('.player-' + opponentTeam + '.selected').attr('data-player-number');
+							team = $('.player-' + opponentTeam + '.selected').attr('data-team');
 						}
 						addEvent(
 							videoTime,
@@ -77,7 +81,7 @@ $(document).ready(function() {
 							loser,
 							$('#loc').val()
 						);
-						$('.player-' + $('#opponent-team').val() + '.selected').removeClass('selected');
+						$('.player-' + opponentTeam + '.selected').removeClass('selected');
 						break;
 					default:
 						addEvent(
@@ -205,6 +209,27 @@ $(document).ready(function() {
 		  // Format and set the values
 		  minutesElem.val(minutes.toString().padStart(2, '0'));
 		  secondsElem.val(seconds.toString().padStart(2, '0'));
+		  
+		  // Save data
+		  /*
+		  const gameInfo = JSON.parse(localStorage.getItem('gameInfo')) || [];
+		  gameInfo.push({
+		    opponent: ,
+		    videoMinutes: ,
+		    videoSeconds: ,
+		    gameMinutes: ,
+		    gameSeconds: 
+		  });
+		  localStorage.setItem('gameInfo', JSON.stringify(gameInfo));
+		  */
+		  
+		  if (timer == 'game') {
+			  if (unit == 'minutes') {
+				  gameTimeMinutes = minutes;
+			  } else {
+				  gameTimeSeconds = seconds;
+			  }
+		  }
 		}
 		
 		$('#video-minutes-plus').click(function() {
@@ -222,16 +247,34 @@ $(document).ready(function() {
 		
 		$('#game-minutes-plus').click(function() {
 			adjustTime('game','minutes', 1);
+			adjustTime('video','minutes', -1);
 		});		
 		$('#game-minutes-minus').click(function() {
 			adjustTime('game','minutes', -1);
+			adjustTime('video','minutes', 1);
 		});
 		$('#game-seconds-plus').click(function() {
 			adjustTime('game','seconds', 1);
+			adjustTime('video','seconds', -1);
 		});		
 		$('#game-seconds-minus').click(function() {
 			adjustTime('game','seconds', -1);
+			adjustTime('video','seconds', 1);
 		});
+		/*
+		$('#game-minutes').change(function() {
+			let minutes = parseInt($(this).val()) || 0;
+			let gameMinutes = parseInt(gameTimeMinutes);
+			adjustTime('video','minutes', gameMinutes - minutes);
+		    gameTimeMinutes = minutes;
+		});
+		$('#game-seconds').change(function() {
+			let seconds = parseInt($(this).val());
+			let gameSeconds = parseInt(gameTimeSeconds);
+			adjustTime('video','seconds', seconds - gameSeconds);
+		    gameTimeSeconds = seconds;
+		});
+		*/
 });
 
 // Load and display existing data

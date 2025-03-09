@@ -3,8 +3,7 @@ $(document).ready(function() {
 	const ice = $('#ice');
 	bench.droppable({drop: function(event, ui) {PlayerDropped(event, ui);}});
 	ice.droppable({drop: function(event, ui) {PlayerDropped(event, ui);}});
-	let playerCount = 0;
-	let activePlayers = {};
+	ice.droppable({drop: function(event, ui) {PlayerDropped(event, ui);}});
 
 	// Player management functionality
 	$('#add-player-btn').click(function() {
@@ -39,44 +38,61 @@ $(document).ready(function() {
 
 	// Function to create a player element
 	function createPlayer(number, team) {
-		// Set up new div for Player
-		const playerId = `player-${team.replace(' ','')}-${number}-${playerCount++}`;
-		var playerDiv = $('<div>', {
-			'id': playerId,
-			'class': `player player-${team.replace(' ','')}`,
-			'data-player-number': number,
-			'data-team': team
-		}).draggable({ revert: "invalid" });
-		
-		if ($('#player-team').val() != 'Opponent') {
-			$('#bench').append(playerDiv);
-		} else {
-			$('#opponents').append(playerDiv);
-		}
-		
-		// Clone the t-shirt template
-        const tshirtTemplate = document.getElementById('tshirt-template');
-        const tshirtSvg = tshirtTemplate.content.cloneNode(true);
-
-		// Add the jersey number
-		const numberDiv = $('<div>', {
-			'class': 'player-number',
-			'html': number
+		// Save to activePlayers data
+		const activePlayers = JSON.parse(localStorage.getItem('activePlayers')) || [];
+		activePlayers.push({
+			playerNumber: number,
+			team: team
 		});
+		localStorage.setItem('activePlayers', JSON.stringify(activePlayers));
 		
-		playerDiv.append(tshirtSvg).append(numberDiv);
-		
-		// Store player in active players
-		/*
-		activePlayers[playerId] = {
-			id: playerId,
-			number: number,
-			team: team,
-			location: 'bench',
-			timeAdded: new Date()
-		};
-		*/
+		loadPlayers();
 	}
+	
+	function loadPlayers() {
+		clearPlayers();
+		const data = JSON.parse(localStorage.getItem('activePlayers')) || [];
+
+		data.forEach((item, index) => {
+			// Set up new div for Player
+			const playerId = `player-${item.team.replace(' ','')}-${item.playerNumber}`;
+			var playerDiv = $('<div>', {
+				'id': playerId,
+				'class': `player player-${item.team.replace(' ','')}`,
+				'data-player-number': item.playerNumber,
+				'data-team': item.team
+			}).draggable({ revert: "invalid" });
+			
+			// Append to proper player area
+			if (item.team == 'Da Beers') {
+				$('#bench').append(playerDiv);
+			} else {
+				$('#opponents').append(playerDiv);
+			}
+			
+			// Clone the t-shirt template
+			const tshirtTemplate = document.getElementById('tshirt-template');
+			const tshirtSvg = tshirtTemplate.content.cloneNode(true);
+			
+			// Add the jersey number
+			const numberDiv = $('<div>', {
+				'class': 'player-number',
+				'html': item.playerNumber
+			});
+			
+			playerDiv.append(tshirtSvg).append(numberDiv);
+		});
+	}
+	
+	function clearPlayers() {
+		$('#bench > *:not(.area-label)').empty();
+		$('#opponents > *:not(.area-label)').empty();
+	}
+	
+	$('#clearPlayersButton').click(function() {
+		localStorage.removeItem('activePlayers');
+		clearPlayers();
+	});
 	
 	// Function when Player is dropped
 	function PlayerDropped(e, ui) {
@@ -118,4 +134,7 @@ $(document).ready(function() {
 			$(this).addClass('selected');
 		}
 	});
+	
+	// Initial data load
+	loadPlayers();
 });

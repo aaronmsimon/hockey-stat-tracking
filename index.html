@@ -17,59 +17,63 @@
 </head>
 
 <body>
-<table>
+<table id="time-keeper">
 <tr>
   <th>Video Time</th>
   <th>Game Time</th>
 </tr>
 <tr>
   <td>
-	  <div class="timer-container">
-		<div class="timer-unit">
-		  <div class="timer-value">
-			<input type="text" id="video-minutes" class="timer-input" value="00" maxlength="2">
+    <table class="timer">
+	  <tr>
+	    <td>Minutes</td>
+		<td>Seconds</td>
+	  </tr>
+	  <tr>
+		<td><input type="text" id="video-minutes" class="timer-input" value="00" maxlength="2"></td>
+		<td><input type="text" id="video-seconds" class="timer-input" value="00" maxlength="2"></td>
+	  </tr>
+	  <tr>
+	    <td>
 			<div class="buttons">
-			  <button id="video-minutes-plus" class="btn">▲</button>
-			  <button id="video-minutes-minus"  class="btn">▼</button>
+			  <button id="video-minutes-plus" class="btn" tabindex="-1">▲</button>
+			  <button id="video-minutes-minus"  class="btn" tabindex="-1">▼</button>
 			</div>
-		  </div>
-		  <span class="timer-label">Minutes</span>
-		</div>
-		<div class="timer-unit">
-		  <div class="timer-value">
-			<input type="text" id="video-seconds" class="timer-input" value="00" maxlength="2">
+		</td>
+		<td>
 			<div class="buttons">
-			  <button id="video-seconds-plus" class="btn">▲</button>
-			  <button id="video-seconds-minus"  class="btn">▼</button>
+			  <button id="video-seconds-plus" class="btn" tabindex="-1">▲</button>
+			  <button id="video-seconds-minus"  class="btn" tabindex="-1">▼</button>
 			</div>
-		  </div>
-		  <span class="timer-label">Seconds</span>
-		</div>
-	  </div>
+		</td>
+	  </tr>
+	</table>
   </td>
   <td>
-	  <div class="timer-container">
-		<div class="timer-unit">
-		  <div class="timer-value">
-			<input type="text" id="game-minutes" class="timer-input" value="20" maxlength="2">
+    <table class="timer">
+	  <tr>
+	    <td>Minutes</td>
+		<td>Seconds</td>
+	  </tr>
+	  <tr>
+		<td><input type="text" id="game-minutes" class="timer-input" value="20" maxlength="2"></td>
+		<td><input type="text" id="game-seconds" class="timer-input" value="00" maxlength="2"></td>
+	  </tr>
+	  <tr>
+	    <td>
 			<div class="buttons">
-			  <button id="game-minutes-plus" class="btn">▲</button>
-			  <button id="game-minutes-minus"  class="btn">▼</button>
+			  <button id="game-minutes-plus" class="btn" tabindex="-1">▲</button>
+			  <button id="game-minutes-minus"  class="btn" tabindex="-1">▼</button>
 			</div>
-		  </div>
-		  <span class="timer-label">Minutes</span>
-		</div>
-		<div class="timer-unit">
-		  <div class="timer-value">
-			<input type="text" id="game-seconds" class="timer-input" value="00" maxlength="2">
+		</td>
+		<td>
 			<div class="buttons">
-			  <button id="game-seconds-plus" class="btn">▲</button>
-			  <button id="game-seconds-minus"  class="btn">▼</button>
+			  <button id="game-seconds-plus" class="btn" tabindex="-1">▲</button>
+			  <button id="game-seconds-minus"  class="btn" tabindex="-1">▼</button>
 			</div>
-		  </div>
-		  <span class="timer-label">Seconds</span>
-		</div>
-	  </div>
+		</td>
+	  </tr>
+	</table>
   </td>
 </tr>
 </table>
@@ -254,8 +258,9 @@
 			</td>
 		</tr>
 	</table>
-	<button id="exportButton">Export Data</button>
-	<button id="clearDataButton">Clear Data</button>
+	<button id="exportButton">Export Game Events</button>
+	<button id="clearDataButton">Clear Game Events</button>
+	<button id="clearPlayersButton">Clear Players</button>
 	
 	<script src="shot-tracker.js"></script>
 	

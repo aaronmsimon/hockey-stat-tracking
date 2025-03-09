@@ -408,3 +408,7 @@ form select {
 form input {
 	margin-right: 10px;
 }
+
+#time-keeper {width: 300px;}
+.timer {width: 100px;}
+.timer td {width: 25px;}
