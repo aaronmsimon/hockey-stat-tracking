@@ -166,6 +166,8 @@ button:hover {
       align-items: center;
       justify-content: center;
       margin: 10px 0;
+	  border: 2px solid #007BFF;
+	  padding-top: 3px;
     }
     
     .period-option {
@@ -412,3 +414,23 @@ form input {
 #time-keeper {width: 300px;}
 .timer {width: 100px;}
 .timer td {width: 25px;}
+
+#interactions {margin-bottom: 10px;}
+
+.edit-input {
+    width: 100%;
+    padding: 2px 4px;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    font-size: 12px;
+}
+
+.saveButton {
+    background-color: #28a745;
+    color: white;
+}
+
+.cancelEditButton {
+    background-color: #dc3545;
+    color: white;
+}

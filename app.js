@@ -3,11 +3,45 @@ $(document).ready(function() {
 	var gameTimeSeconds = 0;
 	
 		// Button actions
-		$('.editButton').click(function() {
-			editItem(item, index);
+		$(document).on('click', '.editButton', function() {
+			var index = $(this).attr('id').substring(5);
+			editItem(index);
 		});
-		$('.deleteButton').click(function() {
+		$(document).on('click', '.deleteButton', function() {
+			var index = $(this).attr('id').substring(7);
 			deleteItem(index);
+		});
+		$(document).on('click', '.saveButton', function() {
+			const index = $(this).data('index');
+			const row = $(this).closest('tr');
+			const data = JSON.parse(localStorage.getItem('gameEvents')) || [];
+			
+			// Get values from input fields
+			const updatedItem = {
+				videotime: row.find('.video-time input').val(),
+				team: row.find('.team input').val(),
+				period: row.find('.period input').val(),
+				gametime: row.find('.game-time input').val(),
+				player: row.find('.event-player input').val(),
+				gameevent: row.find('.stat-type input').val(),
+				additionalinfo: row.find('.additional-info input').val(),
+				location: row.find('.location input').val()
+			};
+			
+			// Update the data
+			data[index] = updatedItem;
+			localStorage.setItem('gameEvents', JSON.stringify(data));
+			
+			// Reload the table to show normal view
+			loadData();
+			$('#editIndex').val(-1);
+		});
+
+		// Cancel editing
+		$(document).on('click', '.cancelEditButton', function() {
+			// Just reload the table to restore original view
+			loadData();
+			$('#editIndex').val(-1);
 		});
 
 		// Handle form submission
@@ -95,35 +129,46 @@ $(document).ready(function() {
 							location
 						);
 				}
-			} else {
-				// Edit existing item
-				data[index] = { column1: $('#column1').val(), column2: $('#column2').val(), column3: $('#column3').val() };
-				$('#editIndex').val() = -1; // Reset edit index
-				$('#cancelButton').addClass('hidden');
 			}
+			
 			document.getElementById('dataForm').reset();
 			eventAdditions();
+			LoadGameInfo();
 		});
-
+		
 		// Edit item
-		function editItem(item, index) {
-			$('#column1').val() = item.column1;
-			$('#column2').val() = item.column2;
-			$('#column3').val() = item.column3;
-			if ($('#editIndex').val() != -1) {
-				document.getElementById('row_' + $('#editIndex').val()).classList.remove('hidden');
-			}
-			$('#editIndex').val() = index;
-			$('#cancelButton').style.display = 'inline-block';
-			document.getElementById('row_' + index).classList.add('hidden');
+		function editItem(index) {
+			// Get the data for this row
+			const data = JSON.parse(localStorage.getItem('gameEvents')) || [];
+			const item = data[index];
+			
+			// Find the row
+			const row = $(`#edit_${index}`).closest('tr');
+			
+			// Replace each cell with input fields
+			row.find('.video-time').html(`<input type="text" class="edit-input" value="${item.videotime}">`);
+			row.find('.team').html(`<input type="text" class="edit-input" value="${item.team}">`);
+			row.find('.period').html(`<input type="text" class="edit-input" value="${item.period}">`);
+			row.find('.game-time').html(`<input type="text" class="edit-input" value="${item.gametime}">`);
+			row.find('.event-player').html(`<input type="text" class="edit-input" value="${item.player}">`);
+			row.find('.stat-type').html(`<input type="text" class="edit-input" value="${item.gameevent}">`);
+			row.find('.additional-info').html(`<input type="text" class="edit-input" value="${item.additionalinfo}">`);
+			row.find('.location').html(`<input type="text" class="edit-input" value="${item.location}">`);
+			
+			// Replace the edit/delete buttons with save/cancel buttons
+			row.find('.controls').html(`
+				<button class="saveButton" data-index="${index}"><i class="fas fa-check"></i></button>
+				<button class="cancelEditButton" data-index="${index}"><i class="fas fa-times"></i></button>
+			`);
+			$('#editIndex').val(index);
+			//$('#cancelButton').css('display', 'inline-block');
 		}
 
 		// Cancel editing
 		$('#cancelButton').click(function() {
 			document.getElementById('dataForm').reset();
-			document.getElementById('row_' + $('#editIndex').val()).removeClass('hidden');
-			$('#editIndex').val() = -1;
-			$('#cancelButton').style.display = 'none';
+			$('#editIndex').val(-1);
+			$('#cancelButton').css('display', 'none');
 		});
 
 		// Delete item
@@ -155,7 +200,13 @@ $(document).ready(function() {
 			localStorage.removeItem('gameEvents');
 			loadData();
 		});
+		
+		$('#resetGameInfoButton').click(function() {
+			ResetGameInfo();
+		});
 
+		// Load gameInfo
+		LoadGameInfo();
 		// Initial data load
 		loadData();
 		
@@ -210,19 +261,6 @@ $(document).ready(function() {
 		  minutesElem.val(minutes.toString().padStart(2, '0'));
 		  secondsElem.val(seconds.toString().padStart(2, '0'));
 		  
-		  // Save data
-		  /*
-		  const gameInfo = JSON.parse(localStorage.getItem('gameInfo')) || [];
-		  gameInfo.push({
-		    opponent: ,
-		    videoMinutes: ,
-		    videoSeconds: ,
-		    gameMinutes: ,
-		    gameSeconds: 
-		  });
-		  localStorage.setItem('gameInfo', JSON.stringify(gameInfo));
-		  */
-		  
 		  if (timer == 'game') {
 			  if (unit == 'minutes') {
 				  gameTimeMinutes = minutes;
@@ -232,34 +270,58 @@ $(document).ready(function() {
 		  }
 		}
 		
+		// Save gameInfo if editing Opponent or Period
+		$('#opponent-team').change(function() {
+			SaveGameInfo();
+		});
+		$('input[name="period"]').change(function() {
+			SaveGameInfo();
+		});
+			
 		$('#video-minutes-plus').click(function() {
 			adjustTime('video','minutes', 1);
+			adjustTime('game','minutes', -1);
+			SaveGameInfo();
 		});		
 		$('#video-minutes-minus').click(function() {
 			adjustTime('video','minutes', -1);
+			adjustTime('game','minutes', 1);
+			SaveGameInfo();
 		});
 		$('#video-seconds-plus').click(function() {
 			adjustTime('video','seconds', 1);
+			adjustTime('game','seconds', -1);
+			SaveGameInfo();
 		});		
 		$('#video-seconds-minus').click(function() {
 			adjustTime('video','seconds', -1);
+			adjustTime('game','seconds', 1);
+			SaveGameInfo();
 		});
 		
 		$('#game-minutes-plus').click(function() {
 			adjustTime('game','minutes', 1);
 			adjustTime('video','minutes', -1);
+			SaveGameInfo();
 		});		
 		$('#game-minutes-minus').click(function() {
 			adjustTime('game','minutes', -1);
 			adjustTime('video','minutes', 1);
+			SaveGameInfo();
 		});
 		$('#game-seconds-plus').click(function() {
 			adjustTime('game','seconds', 1);
 			adjustTime('video','seconds', -1);
+			SaveGameInfo();
 		});		
 		$('#game-seconds-minus').click(function() {
 			adjustTime('game','seconds', -1);
 			adjustTime('video','seconds', 1);
+			SaveGameInfo();
+		});
+		
+		$('.timer-input').change(function() {
+			SaveGameInfo();
 		});
 		/*
 		$('#game-minutes').change(function() {
@@ -293,8 +355,8 @@ function loadData() {
 			<td class="additional-info">${item.additionalinfo}</td>
 			<td class="location">${item.location}</td>
 			<td class="controls">
-				<button id="row_${index}" class="editButton"><i class="fas fa-pencil-alt"></i></button>
-				<button class="deleteButton"><i class="fas fa-trash-alt"></i></button>
+				<button id="edit_${index}" class="editButton"><i class="fas fa-pencil-alt"></i></button>
+				<button id="delete_${index}" class="deleteButton"><i class="fas fa-trash-alt"></i></button>
 			</td>
 		`);
 		$('#dataRows').append(row);
@@ -330,3 +392,39 @@ function addEvent(videoTime, team, period, gameTime, player, eventType, addition
 		location
 	);
 */
+
+// Reset gameInfo values
+function ResetGameInfo() {
+  localStorage.removeItem('gameInfo');
+  const gameInfo = {
+	opponent: null,
+	videoMinutes: 0,
+    videoSeconds: 0,
+    gameMinutes: 20,
+    gameSeconds: 0,
+    period: '1st'
+  };
+  localStorage.setItem('gameInfo', JSON.stringify(gameInfo));
+  LoadGameInfo();
+}
+// Load gameInfo values
+function LoadGameInfo() {
+	const gameInfo = JSON.parse(localStorage.getItem('gameInfo'));
+	$('#opponent-team').val(gameInfo.opponent);
+	$('#video-minutes').val(gameInfo.videoMinutes.toString().padStart(2, '0'));
+	$('#video-seconds').val(gameInfo.videoSeconds.toString().padStart(2, '0'));
+	$('#game-minutes').val(gameInfo.gameMinutes.toString().padStart(2, '0'));
+	$('#game-seconds').val(gameInfo.gameSeconds.toString().padStart(2, '0'));
+	$('input[name="period"][value="' + gameInfo.period + '"]').prop('checked', true);
+}
+// Save gameInfo values
+function SaveGameInfo() {
+  const gameInfo = JSON.parse(localStorage.getItem('gameInfo'));
+  gameInfo.opponent = $('#opponent-team').val();
+  gameInfo.videoMinutes = $('#video-minutes').val();
+  gameInfo.videoSeconds = $('#video-seconds').val();
+  gameInfo.gameMinutes = $('#game-minutes').val();
+  gameInfo.gameSeconds = $('#game-seconds').val();
+  gameInfo.period = $('input[name="period"]:checked').val();
+  localStorage.setItem('gameInfo', JSON.stringify(gameInfo));
+}
