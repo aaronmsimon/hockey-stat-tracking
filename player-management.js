@@ -87,10 +87,12 @@ $(document).ready(function() {
 	function clearPlayers() {
 		$('#bench > *:not(.area-label)').empty();
 		$('#opponents > *:not(.area-label)').empty();
+		$('#ice > *:not(.area-label)').empty();
 	}
 	
 	$('#clearPlayersButton').click(function() {
 		localStorage.removeItem('activePlayers');
+		localStorage.removeItem('onIce');
 		clearPlayers();
 	});
 	
@@ -103,18 +105,28 @@ $(document).ready(function() {
 		
 		if (bail) return;
 		
+		var playerNumber = ui.draggable.attr('data-player-number');
+		
+		// Save to onIce data
+		const onIce = JSON.parse(localStorage.getItem('onIce')) || [];
+		
 		var moveType;
 		if (e.target.id == 'ice') {
 			moveType = 'Entered Ice';
+			onIce.push({playerNumber: playerNumber});
+			localStorage.setItem('onIce', JSON.stringify(onIce));
 		} else {
 			moveType = 'Left Ice';
+			const updatedOnIce = onIce.filter(player => player.playerNumber !== playerNumber);
+			localStorage.setItem('onIce', JSON.stringify(updatedOnIce));
 		}
+		console.log(onIce);
 		addEvent(
 			'0:' + $('#video-minutes').val() + ':' + $('#video-seconds').val(),
 			ui.draggable.attr('data-team'),
 			$('input[name="period"]:checked').val(),
 			'0:' + $('#game-minutes').val() + ':' + $('#game-seconds').val(),
-			ui.draggable.attr('data-player-number'),
+			playerNumber,
 			moveType,
 			'',
 			''
@@ -135,6 +147,19 @@ $(document).ready(function() {
 		}
 	});
 	
+	function loadOnIce() {		
+		// Get saved onIce data
+		const onIce = JSON.parse(localStorage.getItem('onIce')) || [];
+		console.log(onIce);
+		
+		// Get player and move to Ice
+		onIce.forEach((item, index) => {
+			var player = $('[data-player-number="' + item.playerNumber + '"][data-team="Da Beers"]');
+			$('#ice').append(player);
+		});
+	}
+	
 	// Initial data load
 	loadPlayers();
+	loadOnIce();
 });
