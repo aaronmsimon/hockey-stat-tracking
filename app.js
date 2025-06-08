@@ -50,13 +50,9 @@ $(document).ready(function() {
 			const videoTime = '0:' + $('#video-minutes').val() + ':' + $('#video-seconds').val();
 			var team;
 			var player;
-			$('.player-DaBeers').each(function(index) {
-				if ($(this).hasClass('selected')) {
-					$(this).removeClass('selected');
-					team = $(this).attr('data-team');
-					player = $(this).attr('data-player-number');
-				}
-			});
+			team = $('.player.selected').attr('data-team');
+			player = $('.player.selected').attr('data-player-number');
+			
 			const period = $('input[name="period"]:checked').val();
 			const gameTime = '0:' + $('#game-minutes').val() + ':' + $('#game-seconds').val();
 			const gameEvent = $('#event').val();
@@ -100,8 +96,10 @@ $(document).ready(function() {
 						var loser;
 						if ($('#faceoff-winner').val() != 'Opponent') {
 							loser = $('.player-' + opponentTeam + '.selected').attr('data-player-number');
+							player = $('.player-DaBeers.selected').attr('data-player-number');
+							team = 'DaBeers';
 						} else {
-							loser = player;
+							loser = $('.player-DaBeers.selected').attr('data-player-number');
 							player = $('.player-' + opponentTeam + '.selected').attr('data-player-number');
 							team = $('.player-' + opponentTeam + '.selected').attr('data-team');
 						}
@@ -130,6 +128,12 @@ $(document).ready(function() {
 						);
 				}
 			}
+			
+			$('.player.selected').each(function(index) {
+				if ($(this).hasClass('selected')) {
+					$(this).removeClass('selected');
+				}
+			});
 			
 			document.getElementById('dataForm').reset();
 			eventAdditions();
