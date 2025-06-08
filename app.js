@@ -322,6 +322,11 @@ $(document).ready(function() {
 			adjustTime('game','seconds', -1);
 			adjustTime('video','seconds', 1);
 			SaveGameInfo();
+		});	
+		$('#game-seconds-minus-10').click(function() {
+			adjustTime('game','seconds', -10);
+			adjustTime('video','seconds', 10);
+			SaveGameInfo();
 		});
 		
 		$('.timer-input').change(function() {
