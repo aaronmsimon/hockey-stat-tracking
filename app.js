@@ -97,7 +97,7 @@ $(document).ready(function() {
 						if ($('#faceoff-winner').val() != 'Opponent') {
 							loser = $('.player-' + opponentTeam + '.selected').attr('data-player-number');
 							player = $('.player-DaBeers.selected').attr('data-player-number');
-							team = 'DaBeers';
+							team = 'Da Beers';
 						} else {
 							loser = $('.player-DaBeers.selected').attr('data-player-number');
 							player = $('.player-' + opponentTeam + '.selected').attr('data-player-number');
